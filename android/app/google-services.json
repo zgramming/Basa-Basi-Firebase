@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "919014584590",
+    "firebase_url": "https://basa-basi-a1ba4-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "basa-basi-a1ba4",
+    "storage_bucket": "basa-basi-a1ba4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:919014584590:android:7caa4cb65bd54e3d31275f",
+        "android_client_info": {
+          "package_name": "zeffry.reynando.basa_basi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "919014584590-134jbu89j7i73qdk6tglkba6p57fc43k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "zeffry.reynando.basa_basi",
+            "certificate_hash": "8a11eacecf50477e8418273e077fcff550b85276"
+          }
+        },
+        {
+          "client_id": "919014584590-5hfbd5s1noegljg0lbrdgucn8q2qunfd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHxC9jda7vDAUNyvjP0jxqD-lZGDSKn1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "919014584590-5hfbd5s1noegljg0lbrdgucn8q2qunfd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
