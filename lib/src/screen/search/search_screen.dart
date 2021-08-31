@@ -81,32 +81,12 @@ class _SearchScreenState extends State<SearchScreen> {
                               ),
                         ),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.all(8.0),
-                      //   child: Text(
-                      //     'Sudah kenal',
-                      //     style: Constant().fontComfortaa.copyWith(
-                      //           color: colorPallete.accentColor,
-                      //         ),
-                      //   ),
-                      // ),
-                      // Padding(
-                      //   padding: const EdgeInsets.all(8.0),
-                      //   child: Text(
-                      //     'Belum kenal',
-                      //     style: Constant().fontComfortaa.copyWith(
-                      //           color: colorPallete.accentColor,
-                      //         ),
-                      //   ),
-                      // ),
                     ],
                   ),
                   const Expanded(
                     child: TabBarView(
                       children: [
                         SearchResult(),
-                        // KnownPeopleTabbar(),
-                        // UnknownPeopleTabbar(),
                       ],
                     ),
                   ),

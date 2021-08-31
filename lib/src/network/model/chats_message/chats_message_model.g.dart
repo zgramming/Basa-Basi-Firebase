@@ -13,11 +13,12 @@ ChatsMessageModel _$ChatsMessageModelFromJson(Map<String, dynamic> json) {
     pairingId: json['pairing_id'] as String,
     messageContent: json['message_content'] as String,
     messageDate: GlobalFunction.fromJsonMilisecondToDateTime(
-        json['message_date'] as int),
+        json['message_date'] as int?),
     messageType: _$enumDecode(_$MessageTypeEnumMap, json['message_type']),
     messageStatus: _$enumDecode(_$MessageStatusEnumMap, json['message_status']),
     messageReplyId: json['message_reply_id'] as String,
     channelMessage: json['channel_message'] as String,
+    urlFile: json['url_file'] as String?,
   );
 }
 
@@ -33,6 +34,7 @@ Map<String, dynamic> _$ChatsMessageModelToJson(ChatsMessageModel instance) =>
       'message_status': _$MessageStatusEnumMap[instance.messageStatus],
       'message_reply_id': instance.messageReplyId,
       'channel_message': instance.channelMessage,
+      'url_file': instance.urlFile,
     };
 
 K _$enumDecode<K, V>(

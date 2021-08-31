@@ -68,6 +68,7 @@ class ChatsRecentProvider extends StateNotifier<List<ChatsRecentModel>> {
     required String pairingId,
     required String senderId,
     required String messageContent,
+    required MessageType messageType,
     required int messageDate,
   }) async {
     /**
@@ -103,9 +104,9 @@ class ChatsRecentProvider extends StateNotifier<List<ChatsRecentModel>> {
         /// Kawan bicaranya
         'pairing_id': pairingId,
         'recent_message': messageContent,
+        'message_type': MessageTypeValues[messageType],
         'recent_message_date': messageDate,
         'count_unread_message': sender?.countUnreadMessage ?? 0,
-        'is_typing': sender?.isTyping ?? false,
         'is_archived': sender?.isArchived ?? false,
         'message_status':
             MessageStatusValues[MessageStatus.send] ?? MessageStatusValues[MessageStatus.send],
@@ -123,9 +124,9 @@ class ChatsRecentProvider extends StateNotifier<List<ChatsRecentModel>> {
         'sender_id': senderId,
         'pairing_id': senderId,
         'recent_message': messageContent,
+        'message_type': MessageTypeValues[messageType],
         'recent_message_date': messageDate,
         'count_unread_message': (pairing?.countUnreadMessage ?? 0) + 1,
-        'is_typing': pairing?.isTyping ?? false,
         'is_archived': pairing?.isArchived ?? false,
         'message_status':
             MessageStatusValues[MessageStatus.none] ?? MessageStatusValues[MessageStatus.none],
@@ -168,19 +169,25 @@ class ChatsRecentProvider extends StateNotifier<List<ChatsRecentModel>> {
   Future<void> updateTypingStatus({
     required String senderId,
     required String pairingId,
-    required String channelMessage,
     required bool isTyping,
   }) async {
+    final channelMessage = getConversationID(
+      senderId: senderId,
+      pairingId: pairingId,
+    );
+
     final reference = _database.child('${Constant().childChatsRecent}/$senderId/$channelMessage');
     final data = await reference.get();
+
     if (data.value != null) {
       await reference.update({
         'is_typing': isTyping,
+        'last_typing_date': DateTime.now().millisecondsSinceEpoch,
       });
 
       state = [
         for (final item in state)
-          if (item.id == senderId) item.copyWith(isTyping: true) else item
+          if (item.id == senderId) item.copyWith(isTyping: isTyping) else item
       ];
     }
   }

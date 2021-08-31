@@ -58,6 +58,7 @@ class ChatsMessageModel extends Equatable {
     this.messageStatus = MessageStatus.pending,
     this.messageReplyId = 'nulled',
     this.channelMessage = '',
+    this.urlFile = '',
   });
 
   final String id;
@@ -73,13 +74,14 @@ class ChatsMessageModel extends Equatable {
   final MessageStatus messageStatus;
   final String messageReplyId;
   final String channelMessage;
+  final String? urlFile;
 
   factory ChatsMessageModel.fromJson(Map<String, dynamic> json) =>
       _$ChatsMessageModelFromJson(json);
   Map<String, dynamic> toJson() => _$ChatsMessageModelToJson(this);
 
   @override
-  List get props {
+  List<Object?> get props {
     return [
       id,
       senderId,
@@ -90,6 +92,7 @@ class ChatsMessageModel extends Equatable {
       messageStatus,
       messageReplyId,
       channelMessage,
+      urlFile,
     ];
   }
 
@@ -106,6 +109,7 @@ class ChatsMessageModel extends Equatable {
     MessageStatus? messageStatus,
     String? messageReplyId,
     String? channelMessage,
+    String? urlFile,
   }) {
     return ChatsMessageModel(
       id: id ?? this.id,
@@ -117,6 +121,7 @@ class ChatsMessageModel extends Equatable {
       messageStatus: messageStatus ?? this.messageStatus,
       messageReplyId: messageReplyId ?? this.messageReplyId,
       channelMessage: channelMessage ?? this.channelMessage,
+      urlFile: urlFile ?? this.urlFile,
     );
   }
 }

@@ -15,25 +15,33 @@ class ChatsRecentModel extends Equatable {
     this.idUser,
     this.channelMessage = '',
     this.recentMessage = '',
+    this.messageType = MessageType.onlyText,
     this.messageStatus = MessageStatus.pending,
     this.recentMessageDate,
+    this.lastTypingDate,
     this.pairingId = '',
     this.senderId = '',
     this.countUnreadMessage = 0,
-    this.isTyping = false,
-    this.isArchived = false,
+    this.isTyping,
+    this.isArchived,
   });
 
   final String? id;
   final String? idUser;
   final String? channelMessage;
   final String? recentMessage;
+  final MessageType? messageType;
   final MessageStatus? messageStatus;
   @JsonKey(
     fromJson: GlobalFunction.fromJsonMilisecondToDateTime,
     toJson: GlobalFunction.toJsonMilisecondFromDateTime,
   )
   final DateTime? recentMessageDate;
+  @JsonKey(
+    fromJson: GlobalFunction.fromJsonMilisecondToDateTime,
+    toJson: GlobalFunction.toJsonMilisecondFromDateTime,
+  )
+  final DateTime? lastTypingDate;
   final String? pairingId;
   final String? senderId;
   final int? countUnreadMessage;
@@ -44,14 +52,16 @@ class ChatsRecentModel extends Equatable {
   Map<String, dynamic> toJson() => _$ChatsRecentModelToJson(this);
 
   @override
-  List get props {
+  List<Object?> get props {
     return [
       id,
       idUser,
       channelMessage,
       recentMessage,
+      messageType,
       messageStatus,
       recentMessageDate,
+      lastTypingDate,
       pairingId,
       senderId,
       countUnreadMessage,
@@ -68,8 +78,10 @@ class ChatsRecentModel extends Equatable {
     String? idUser,
     String? channelMessage,
     String? recentMessage,
+    MessageType? messageType,
     MessageStatus? messageStatus,
     DateTime? recentMessageDate,
+    DateTime? lastTypingDate,
     String? pairingId,
     String? senderId,
     int? countUnreadMessage,
@@ -81,8 +93,10 @@ class ChatsRecentModel extends Equatable {
       idUser: idUser ?? this.idUser,
       channelMessage: channelMessage ?? this.channelMessage,
       recentMessage: recentMessage ?? this.recentMessage,
+      messageType: messageType ?? this.messageType,
       messageStatus: messageStatus ?? this.messageStatus,
       recentMessageDate: recentMessageDate ?? this.recentMessageDate,
+      lastTypingDate: lastTypingDate ?? this.lastTypingDate,
       pairingId: pairingId ?? this.pairingId,
       senderId: senderId ?? this.senderId,
       countUnreadMessage: countUnreadMessage ?? this.countUnreadMessage,
@@ -91,12 +105,3 @@ class ChatsRecentModel extends Equatable {
     );
   }
 }
-
-
-// @JsonKey(
-//     toJson: GlobalFunction.toJsonStringFromInteger,
-//     fromJson: GlobalFunction.fromJsonStringToInteger,
-//   )
-
-// factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
-// Map<String, dynamic> toJson() => _$UserModelToJson(this);

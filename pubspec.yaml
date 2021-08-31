@@ -24,10 +24,10 @@ dependencies:
   cached_network_image: ^3.1.0
   cupertino_icons: ^1.0.2
   dio: ^4.0.0
-  emoji_picker_flutter: ^1.0.6
   equatable: ^2.0.3
   firebase_core: ^1.6.0
   firebase_database: ^7.2.1
+  firebase_storage: ^10.0.3
   flutter:
     sdk: flutter
   flutter_feather_icons: ^2.0.0+1
@@ -38,9 +38,10 @@ dependencies:
     path: global_template
   google_fonts: ^2.1.0
   google_sign_in: ^5.0.7
+  image_picker: ^0.8.3+3
   introduction_screen: ^2.1.0
-  json_annotation:
-  json_serializable:
+  json_annotation: null
+  json_serializable: null
   path_provider: ^2.0.2
   permission_handler: ^8.1.4+2
   rxdart: ^0.27.1

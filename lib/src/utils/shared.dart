@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:global_template/functions/global_function.dart';
 
@@ -32,7 +30,7 @@ String compareDateMessage(DateTime date) {
   final dateCompared = DateTime(date.year, date.month, date.day, date.hour);
   final dateNow = DateTime(now.year, now.month, now.day, date.hour);
   final diff = dateNow.difference(dateCompared).inDays;
-  log(' Compared : $dateNow - $dateCompared\ndifferent $diff');
+  // log(' Compared : $dateNow - $dateCompared\ndifferent $diff');
   if (diff > 1) {
     return GlobalFunction.formatYMD(dateCompared, type: 3);
   } else if (diff > 0 && diff <= 1) {
@@ -40,6 +38,12 @@ String compareDateMessage(DateTime date) {
   } else {
     return 'Hari ini';
   }
+}
+
+bool isStillTyping(DateTime now, DateTime? lastTyping) {
+  final _lastTyping = lastTyping ?? DateTime.now();
+  final diff = _lastTyping.add(const Duration(seconds: 5)).difference(now).inSeconds;
+  return diff <= 0;
 }
 
 /**

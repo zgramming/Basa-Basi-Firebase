@@ -144,32 +144,42 @@ class MessageRecentItem extends StatelessWidget {
                                           child: Align(
                                               alignment: Alignment.centerLeft,
                                               child: AnimatedSwitcher(
-                                                duration: const Duration(milliseconds: 500),
-                                                switchInCurve: Curves.easeIn,
-                                                switchOutCurve: Curves.easeOut,
-                                                child: message.isTyping ?? false
-                                                    ? Text(
-                                                        'Sedang mengetik...',
-                                                        key: UniqueKey(),
-                                                        style: Constant().fontComfortaa.copyWith(
-                                                              color: colorPallete.accentColor,
-                                                              fontWeight: FontWeight.bold,
-                                                              fontSize: 10.0,
-                                                            ),
-                                                      )
-                                                    : Text(
-                                                        recent.recentMessage ?? '',
-                                                        textAlign: TextAlign.left,
-                                                        key: UniqueKey(),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
-                                                        style: Constant().fontComfortaa.copyWith(
-                                                              fontWeight: FontWeight.w200,
-                                                              fontSize: 12.0,
-                                                              color: Colors.grey[400],
-                                                            ),
-                                                      ),
-                                              )),
+                                                  duration: const Duration(milliseconds: 500),
+                                                  switchInCurve: Curves.easeIn,
+                                                  switchOutCurve: Curves.easeOut,
+                                                  child: Consumer(
+                                                    builder: (context, ref, child) {
+                                                      final clock =
+                                                          ref.watch(realtimeClock).data?.value ??
+                                                              DateTime.now();
+                                                      return isStillTyping(
+                                                              clock, message.lastTypingDate)
+                                                          ? Text(
+                                                              'Sedang mengetik...',
+                                                              key: UniqueKey(),
+                                                              style: Constant()
+                                                                  .fontComfortaa
+                                                                  .copyWith(
+                                                                    color: colorPallete.accentColor,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 10.0,
+                                                                  ),
+                                                            )
+                                                          : Text(
+                                                              recent.recentMessage ?? '',
+                                                              textAlign: TextAlign.left,
+                                                              key: UniqueKey(),
+                                                              maxLines: 1,
+                                                              overflow: TextOverflow.ellipsis,
+                                                              style:
+                                                                  Constant().fontComfortaa.copyWith(
+                                                                        fontWeight: FontWeight.w200,
+                                                                        fontSize: 12.0,
+                                                                        color: Colors.grey[400],
+                                                                      ),
+                                                            );
+                                                    },
+                                                  ))),
                                         ),
                                         const SizedBox(height: 15),
                                         if ((recent.countUnreadMessage ?? 0) > 0)
@@ -224,6 +234,10 @@ class MessageRecentItem extends StatelessWidget {
                                       pairingId: pairing.id,
                                       channelMessage: channelMessage,
                                     );
+
+                                ///TODO Save pairing ID to global provider, then we can use on anywhere screen
+                                ref.read(pairingId).state = pairing.id;
+
                                 Future.delayed(const Duration(milliseconds: 50), () {
                                   Navigator.of(context).pushNamed(
                                     MessageDetailScreen.routeNamed,

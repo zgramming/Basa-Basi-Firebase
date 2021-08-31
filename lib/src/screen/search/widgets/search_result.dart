@@ -94,6 +94,9 @@ class _SearchResultState extends ConsumerState<SearchResult> with AutomaticKeepA
                                           pairingId: pairing.id,
                                           channelMessage: channelMessage,
                                         );
+
+                                    ///TODO Save pairing ID to global provider, then we can use on anywhere screen
+                                    ref.read(pairingId).state = pairing.id;
                                     Future.delayed(const Duration(milliseconds: 200), () {
                                       Navigator.of(context).pushNamed(
                                         MessageDetailScreen.routeNamed,

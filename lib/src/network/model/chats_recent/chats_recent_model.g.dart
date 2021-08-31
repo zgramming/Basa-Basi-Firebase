@@ -12,10 +12,14 @@ ChatsRecentModel _$ChatsRecentModelFromJson(Map<String, dynamic> json) {
     idUser: json['id_user'] as String?,
     channelMessage: json['channel_message'] as String?,
     recentMessage: json['recent_message'] as String?,
+    messageType:
+        _$enumDecodeNullable(_$MessageTypeEnumMap, json['message_type']),
     messageStatus:
         _$enumDecodeNullable(_$MessageStatusEnumMap, json['message_status']),
     recentMessageDate: GlobalFunction.fromJsonMilisecondToDateTime(
-        json['recent_message_date'] as int),
+        json['recent_message_date'] as int?),
+    lastTypingDate: GlobalFunction.fromJsonMilisecondToDateTime(
+        json['last_typing_date'] as int?),
     pairingId: json['pairing_id'] as String?,
     senderId: json['sender_id'] as String?,
     countUnreadMessage: json['count_unread_message'] as int?,
@@ -30,9 +34,12 @@ Map<String, dynamic> _$ChatsRecentModelToJson(ChatsRecentModel instance) =>
       'id_user': instance.idUser,
       'channel_message': instance.channelMessage,
       'recent_message': instance.recentMessage,
+      'message_type': _$MessageTypeEnumMap[instance.messageType],
       'message_status': _$MessageStatusEnumMap[instance.messageStatus],
       'recent_message_date': GlobalFunction.toJsonMilisecondFromDateTime(
           instance.recentMessageDate),
+      'last_typing_date':
+          GlobalFunction.toJsonMilisecondFromDateTime(instance.lastTypingDate),
       'pairing_id': instance.pairingId,
       'sender_id': instance.senderId,
       'count_unread_message': instance.countUnreadMessage,
@@ -76,6 +83,14 @@ K? _$enumDecodeNullable<K, V>(
   }
   return _$enumDecode<K, V>(enumValues, source, unknownValue: unknownValue);
 }
+
+const _$MessageTypeEnumMap = {
+  MessageType.onlyText: 'only_text',
+  MessageType.onlyImage: 'only_image',
+  MessageType.imageWithText: 'image_with_text',
+  MessageType.file: 'file',
+  MessageType.voice: 'voice',
+};
 
 const _$MessageStatusEnumMap = {
   MessageStatus.none: 'none',
