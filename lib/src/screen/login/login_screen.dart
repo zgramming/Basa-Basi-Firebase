@@ -73,6 +73,11 @@ class LoginScreen extends ConsumerWidget {
                               }
                             } catch (e) {
                               log(e.toString());
+                              GlobalFunction.showSnackBar(
+                                context,
+                                content: Text('${e.toString()}'),
+                                snackBarType: SnackBarType.error,
+                              );
                             } finally {
                               log('Finally Done');
                               ref.read(isLoading).state = false;
