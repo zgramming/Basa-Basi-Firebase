@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:equatable/equatable.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -9,29 +10,27 @@ import '../../utils/utils.dart';
 import '../global/global_provider.dart';
 import '../provider.dart';
 
-class UserProvider extends StateNotifier<UserModel?> {
-  UserProvider() : super(const UserModel());
+class UserProvider extends StateNotifier<UserState> {
+  UserProvider() : super(const UserState());
 
-  final FirebaseDatabase _database = FirebaseDatabase();
+  final _database = FirebaseDatabase();
+  final _googleSignIn = GoogleSignIn();
+  final _sessionProvider = SessionProvider();
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  static final provider = StateNotifierProvider<UserProvider, UserState?>((ref) => UserProvider());
 
-  static final provider = StateNotifierProvider<UserProvider, UserModel?>((ref) => UserProvider());
-
-  Future<bool> isAlreadySignIn() async {
-    final GoogleSignIn _googleSignIn = GoogleSignIn();
-
+  Future<UserModel?> isAlreadySignIn() async {
     final alreadySignIn = await _googleSignIn.isSignedIn();
     if (!alreadySignIn) {
-      state = null;
-      return false;
+      state = state.reset();
+      return null;
     }
     final idUser = (await _googleSignIn.signIn())?.id;
     final getUser = (await _database.reference().child('users/$idUser').get()).value as Map;
     final user = UserModel.fromJson(Map.from(getUser));
-    state = user;
+    state = state.setUser(user);
 
-    return true;
+    return user;
   }
 
   Future<bool> signIn() async {
@@ -56,7 +55,7 @@ class UserProvider extends StateNotifier<UserModel?> {
         isLogin: true,
         loginAt: DateTime.now(),
       );
-      state = user;
+      state = state.setUser(user);
     }
 
     return true;
@@ -64,7 +63,7 @@ class UserProvider extends StateNotifier<UserModel?> {
 
   Future<void> signOut() async {
     await _googleSignIn.signOut();
-    state = null;
+    state = state.reset();
   }
 
   Future<void> _registerUser(GoogleSignInAccount? account) async {
@@ -78,13 +77,13 @@ class UserProvider extends StateNotifier<UserModel?> {
     );
     await _database.reference().child('users/${account?.id}').update(user.toJson());
 
-    state = user;
+    state = state.setUser(user);
   }
 }
 
 final searchUserByEmail = FutureProvider.autoDispose((ref) async {
   final _database = FirebaseDatabase.instance.reference();
-  final user = ref.watch(UserProvider.provider);
+  final user = ref.watch(UserProvider.provider)?.user;
 
   final tempList = <UserModel>[];
   final query = ref.watch(searchQueryEmail).state;
@@ -114,3 +113,27 @@ final searchUserById = FutureProvider.autoDispose.family<UserModel, String>((ref
   final user = UserModel.fromJson(map);
   return user;
 });
+
+class UserState extends Equatable {
+  final UserModel? user;
+  const UserState({
+    this.user,
+  });
+
+  UserState setUser(UserModel model) => copyWith(user: model);
+  UserState reset() => copyWith();
+
+  @override
+  List<Object?> get props => [user];
+
+  @override
+  bool get stringify => true;
+
+  UserState copyWith({
+    UserModel? user,
+  }) {
+    return UserState(
+      user: user ?? this.user,
+    );
+  }
+}

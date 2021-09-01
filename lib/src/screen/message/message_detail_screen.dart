@@ -1,16 +1,14 @@
-import 'dart:developer';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 
 import '../../network/network.dart';
-import '../../provider/provider.dart';
-import '../../utils/utils.dart';
 
 import './widgets/message_detail_screen_content.dart';
 import './widgets/message_detail_screen_footer.dart';
+import 'widgets/message_detail_screen_listen_typing.dart';
 
 class MessageDetailScreen extends StatelessWidget {
   static const routeNamed = '/message-detail-screen';
@@ -59,44 +57,7 @@ class MessageDetailScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     Align(alignment: Alignment.centerLeft, child: Text(pairing?.name ?? '')),
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final _streamTyping = ref.watch(listenRecentMessage(pairing?.id ?? ''));
-                        return _streamTyping.when(
-                          data: (message) {
-                            return AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 500),
-                              switchInCurve: Curves.bounceIn,
-                              switchOutCurve: Curves.bounceOut,
-                              child: Consumer(
-                                builder: (context, ref, child) {
-                                  final clock =
-                                      ref.watch(realtimeClock).data?.value ?? DateTime.now();
-                                  return (isStillTyping(clock, message.lastTypingDate))
-                                      ? Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            'Sedang mengetik...',
-                                            textAlign: TextAlign.left,
-                                            style: Constant().fontComfortaa.copyWith(
-                                                fontSize: 10.0, fontWeight: FontWeight.bold),
-                                          ),
-                                        )
-                                      : const SizedBox();
-                                },
-                              ),
-                            );
-                          },
-                          loading: () => const Center(child: CircularProgressIndicator()),
-                          error: (error, stackTrace) {
-                            log('error $stackTrace');
-                            return Center(
-                              child: Text(error.toString()),
-                            );
-                          },
-                        );
-                      },
-                    ),
+                    const MessageDetailScreenListenTyping(),
                   ],
                 ),
               ),

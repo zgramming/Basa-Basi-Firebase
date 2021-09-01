@@ -261,7 +261,7 @@ class ChatsRecentProvider extends StateNotifier<List<ChatsRecentModel>> {
 // });
 
 final getRecentMessage = StreamProvider.autoDispose<List<ChatsRecentModel>>((ref) {
-  final user = ref.watch(UserProvider.provider);
+  final user = ref.watch(UserProvider.provider)?.user;
 
   final result = ref.watch(ChatsRecentProvider.provider.notifier).getRecentMessage(user?.id ?? '');
   ref.onDispose(() {
@@ -285,7 +285,7 @@ final recentMessageArchived =
 });
 
 final listenTyping = StreamProvider.autoDispose.family<bool, String>((ref, pairingId) {
-  final user = ref.watch(UserProvider.provider);
+  final user = ref.watch(UserProvider.provider)?.user;
   final channelMessage = getConversationID(senderId: user?.id ?? '', pairingId: pairingId);
   final result = ref
       .watch(ChatsRecentProvider.provider.notifier)
@@ -295,7 +295,7 @@ final listenTyping = StreamProvider.autoDispose.family<bool, String>((ref, pairi
 
 final listenRecentMessage =
     StreamProvider.autoDispose.family<ChatsRecentModel, String>((ref, pairingId) {
-  final userLogin = ref.watch(UserProvider.provider);
+  final userLogin = ref.watch(UserProvider.provider)?.user;
   final result = ref.watch(ChatsRecentProvider.provider.notifier).listenRecentMessage(
         pairingId: pairingId,
         userLoginId: userLogin?.id ?? '',

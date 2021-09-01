@@ -109,7 +109,7 @@ class _MessageDetailScreenFooterState extends State<MessageDetailScreenFooter> {
 
                         if (value.length == 1) {
                           try {
-                            final userLogin = ref.read(UserProvider.provider);
+                            final userLogin = ref.read(UserProvider.provider)?.user;
                             final _pairingId = ref.read(pairingId).state;
 
                             await ref
@@ -125,7 +125,7 @@ class _MessageDetailScreenFooterState extends State<MessageDetailScreenFooter> {
                         } else {
                           debouncer.run(() async {
                             try {
-                              final userLogin = ref.read(UserProvider.provider);
+                              final userLogin = ref.read(UserProvider.provider)?.user;
                               final _pairingId = ref.read(pairingId).state;
 
                               await ref
@@ -155,7 +155,7 @@ class _MessageDetailScreenFooterState extends State<MessageDetailScreenFooter> {
                         throw Exception('Pesan tidak boleh kosong');
                       }
                       ref.read(isLoading).state = true;
-                      final user = ref.read(UserProvider.provider);
+                      final user = ref.read(UserProvider.provider)?.user;
                       final _pairingId = ref.read(pairingId).state;
                       final messageContent = _messageController.text;
                       _messageController.clear();

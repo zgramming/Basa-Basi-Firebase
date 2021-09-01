@@ -14,6 +14,7 @@ class Constant {
 
   /// Shared Preferences keys
   String get onboardingKey => 'onboardingKey';
+  String get userKey => 'userKey';
 
   ///* Path Firebase Child
   String get childUsers => 'users';

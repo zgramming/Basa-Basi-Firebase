@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -18,29 +20,40 @@ class SplashScreen extends ConsumerStatefulWidget {
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
-  void initState() {
-    ref.read(initializeApplication.future).then((_) {
-      final alreadyOnboarding = ref.read(SessionProvider.provider).isAlreadyOnboarding;
-      final alreadySignIn = ref.read(UserProvider.provider);
-
-      if (!alreadyOnboarding) {
-        Navigator.of(context).pushReplacementNamed(Introduction.routeNamed);
-      } else if (alreadySignIn == null) {
-        Navigator.of(context).pushReplacementNamed(LoginScreen.routeNamed);
-      } else {
-        Navigator.of(context).pushReplacementNamed(WelcomeScreen.routeNamed);
-      }
-    });
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colorPallete.primaryColor,
-      body: const Center(
-        child: CircularProgressIndicator(
-          color: Colors.white,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Stack(
+          children: [
+            // const Center(
+            //   child: CircularProgressIndicator(
+            //     color: Colors.white,
+            //   ),
+            // ),
+            Consumer(
+              builder: (context, ref, child) {
+                final _readSession = ref.watch(initializeApplication);
+                return _readSession.when(
+                  data: (value) {
+                    if (!value.alreadyOnboarding) {
+                      return const Introduction();
+                    } else if (value.user == null) {
+                      return const LoginScreen();
+                    } else {
+                      return const WelcomeScreen();
+                    }
+                  },
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (error, stackTrace) {
+                    log('error splash screen $stackTrace');
+                    return Positioned.fill(child: Center(child: Text(error.toString())));
+                  },
+                );
+              },
+            )
+          ],
         ),
       ),
     );

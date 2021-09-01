@@ -7,7 +7,7 @@ final searchQueryEmail = StateProvider.autoDispose<String>((ref) => '');
 final pairingId = StateProvider<String>((ref) => '');
 
 final realtimeClock = StreamProvider.autoDispose<DateTime>((ref) {
-  return Stream.periodic(const Duration(seconds: 1), (_) {
+  return Stream.periodic(const Duration(seconds: 4), (_) {
     return DateTime.now();
   });
 });

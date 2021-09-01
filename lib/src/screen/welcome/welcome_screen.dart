@@ -1,18 +1,13 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../provider/provider.dart';
-import '../../utils/utils.dart';
 
 import '../account/account_screen.dart';
-import '../login/login_screen.dart';
 import '../message/message_screen.dart';
-import '../search/search_screen.dart';
+import 'widgets/welcome_screen_appbar_action.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const routeNamed = '/welcome-screen';
@@ -23,13 +18,10 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-
   int _selectedIndex = 0;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -37,6 +29,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     MessageScreen(),
     AccountScreen(),
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,12 +37,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         toolbarHeight: kToolbarHeight + 10,
         title: Consumer(
           builder: (context, ref, child) {
-            final _selectedRecentChat = ref.watch(SelectedRecentChatProvider.provider);
+            final _selectedRecentChat = ref.watch(SelectedRecentChatProvider.provider).items;
             if (_selectedRecentChat.isNotEmpty) {
               return IconButton(
-                onPressed: () {
-                  ref.read(SelectedRecentChatProvider.provider.notifier).reset();
-                },
+                onPressed: () => ref.read(SelectedRecentChatProvider.provider.notifier).reset(),
                 icon: const Icon(FeatherIcons.arrowLeft),
               );
             }
@@ -61,59 +52,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             );
           },
         ),
-        actions: [
-          Consumer(
-            builder: (context, ref, child) {
-              final _selectedRecentChat = ref.watch(SelectedRecentChatProvider.provider);
-              return Wrap(
-                alignment: WrapAlignment.end,
-                runAlignment: WrapAlignment.center,
-                children: [
-                  if (_selectedRecentChat.isEmpty) ...[
-                    IconButton(
-                        onPressed: () async {
-                          Navigator.of(context).pushNamed(SearchScreen.routeNamed);
-                        },
-                        icon: const Icon(FeatherIcons.search)),
-                    PopupMenuButton(
-                      onSelected: (value) async {
-                        switch (value) {
-                          case 'sign_out':
-                            final result = await _googleSignIn.signOut();
-                            log('result logout ${result?.email}');
-                            Navigator.of(context).pushReplacementNamed(LoginScreen.routeNamed);
-                            break;
-                          case 'test_firebase':
-                            // final result = database.child('path');
-                            break;
-                          default:
-                        }
-                      },
-                      itemBuilder: (context) => [],
-                    ),
-                  ] else ...[
-                    Text(
-                      '${_selectedRecentChat.length} pesan dipilih',
-                      style: Constant().fontComfortaa.copyWith(fontSize: 10.0),
-                    ),
-                    IconButton(
-                        onPressed: () async {
-                          final idUser = ref.read(UserProvider.provider)?.id ?? '';
-                          for (final chat in _selectedRecentChat) {
-                            await ref.read(ChatsRecentProvider.provider.notifier).updateArchived(
-                                  idUser: idUser,
-                                  channelMessage: chat.channelMessage ?? '',
-                                  value: true,
-                                );
-                          }
-                          ref.read(SelectedRecentChatProvider.provider.notifier).reset();
-                        },
-                        icon: const Icon(FeatherIcons.archive)),
-                  ],
-                ],
-              );
-            },
-          ),
+        actions: const [
+          WelcomeScreenAppbarAction(),
         ],
       ),
       body: IndexedStack(index: _selectedIndex, children: screens),

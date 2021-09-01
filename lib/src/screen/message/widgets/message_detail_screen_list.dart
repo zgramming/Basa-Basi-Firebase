@@ -68,7 +68,7 @@ class MessageDetailScreenList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, child) {
-        final senderId = ref.watch(UserProvider.provider)?.id ?? '';
+        final senderId = ref.watch(UserProvider.provider)?.user?.id ?? '';
         return ListView.builder(
           physics: const NeverScrollableScrollPhysics(),
           reverse: true,

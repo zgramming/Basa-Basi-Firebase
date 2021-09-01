@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -6,15 +8,15 @@ import '../../../provider/provider.dart';
 
 import './message_recent_item.dart';
 
-class MessageRecents extends ConsumerWidget {
-  const MessageRecents({
+class MessageRecentsList extends ConsumerWidget {
+  const MessageRecentsList({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final recents = ref.watch(recentMessageArchived(false)).state;
-    final userLogin = ref.watch(UserProvider.provider);
+    final userLogin = ref.watch(UserProvider.provider)?.user;
     if (recents.isEmpty) {
       return const Center(
         child: Text('Kamu tidak mempunyai pesan saat ini xD'),
@@ -30,9 +32,8 @@ class MessageRecents extends ConsumerWidget {
       ),
       itemBuilder: (context, index) {
         final recent = recents[index];
-        final isExists = ref.watch(isExistsSelectedRecentChat(recent)).state;
+
         return MessageRecentItem(
-          isSelectedRecentChat: isExists,
           recent: recent,
           userLogin: userLogin,
         );

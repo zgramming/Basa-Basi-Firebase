@@ -83,7 +83,7 @@ class ChatsMessageProvider extends StateNotifier<ChatsMessageState> {
 
 final getMessage =
     StreamProvider.autoDispose.family<List<ChatsMessageModel>, String>((ref, pairingId) {
-  final senderId = ref.watch(UserProvider.provider)?.id ?? '';
+  final senderId = ref.watch(UserProvider.provider)?.user?.id ?? '';
   final channelMessage = getConversationID(senderId: senderId, pairingId: pairingId);
   final result = ref.watch(ChatsMessageProvider.provider.notifier).getMessage(channelMessage);
 

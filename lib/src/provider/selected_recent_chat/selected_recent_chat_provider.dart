@@ -1,39 +1,27 @@
-import 'package:collection/collection.dart';
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../network/network.dart';
 
-import 'package:basa_basi/src/network/network.dart';
+import '../provider.dart';
 
-class SelectedRecentChatProvider extends StateNotifier<List<ChatsRecentModel>> {
-  SelectedRecentChatProvider() : super([]);
-
+class SelectedRecentChatProvider extends StateNotifier<SelectedRecentChatState> {
   static final provider =
-      StateNotifierProvider.autoDispose<SelectedRecentChatProvider, List<ChatsRecentModel>>(
+      StateNotifierProvider.autoDispose<SelectedRecentChatProvider, SelectedRecentChatState>(
           (ref) => SelectedRecentChatProvider());
 
-  void add(ChatsRecentModel chat) {
-    final isExists = state.firstWhereOrNull((element) => element.id == chat.id);
-    state = isExists == null
-        ? [...state, chat]
-        : [...state.where((element) => element.id != chat.id).toList()];
+  SelectedRecentChatProvider() : super(const SelectedRecentChatState());
+
+  bool isExistsSelectedRecentChat(ChatsRecentModel recent) {
+    return state.isExistsSelectedRecentChat(recent);
   }
 
-  bool isExists(ChatsRecentModel chat) {
-    final result = state.firstWhereOrNull((element) => element.id == chat.id);
-    if (result == null) {
-      return false;
-    }
-    return true;
+  void add(ChatsRecentModel chat) {
+    state = state.add(chat);
+    log('Items ${state.items}');
   }
 
   void reset() {
-    state = [];
+    state = state.resetRecentChat();
   }
 }
-
-final isExistsSelectedRecentChat =
-    StateProvider.autoDispose.family<bool, ChatsRecentModel>((ref, chat) {
-  final recentsChat = ref.watch(SelectedRecentChatProvider.provider);
-  final isExists = recentsChat.firstWhereOrNull((element) => element.id == chat.id);
-  if (isExists == null) return false;
-  return true;
-});

@@ -18,7 +18,7 @@ class MessageArchivedScreen extends ConsumerWidget {
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
-              final _selectedRecentChat = ref.read(SelectedRecentChatProvider.provider);
+              final _selectedRecentChat = ref.read(SelectedRecentChatProvider.provider).items;
               if (_selectedRecentChat.isEmpty) {
                 Navigator.of(context).pop();
               }
@@ -30,7 +30,7 @@ class MessageArchivedScreen extends ConsumerWidget {
         actions: [
           Consumer(
             builder: (context, ref, child) {
-              final _selectedRecentChat = ref.watch(SelectedRecentChatProvider.provider);
+              final _selectedRecentChat = ref.watch(SelectedRecentChatProvider.provider).items;
               return Wrap(
                 alignment: WrapAlignment.end,
                 runAlignment: WrapAlignment.center,
@@ -44,7 +44,7 @@ class MessageArchivedScreen extends ConsumerWidget {
                     ),
                     IconButton(
                       onPressed: () async {
-                        final idUser = ref.read(UserProvider.provider)?.id ?? '';
+                        final idUser = ref.read(UserProvider.provider)?.user?.id ?? '';
                         for (final chat in _selectedRecentChat) {
                           await ref.read(ChatsRecentProvider.provider.notifier).updateArchived(
                                 idUser: idUser,
@@ -68,7 +68,7 @@ class MessageArchivedScreen extends ConsumerWidget {
       body: Consumer(
         builder: (context, ref, child) {
           final recents = ref.watch(recentMessageArchived(true)).state;
-          final userLogin = ref.watch(UserProvider.provider);
+          final userLogin = ref.watch(UserProvider.provider)?.user;
 
           return ListView.separated(
             physics: const BouncingScrollPhysics(),
@@ -80,9 +80,8 @@ class MessageArchivedScreen extends ConsumerWidget {
             ),
             itemBuilder: (context, index) {
               final recent = recents[index];
-              final isSelectedRecentChat = ref.watch(isExistsSelectedRecentChat(recent)).state;
+
               return MessageRecentItem(
-                isSelectedRecentChat: isSelectedRecentChat,
                 recent: recent,
                 userLogin: userLogin,
               );

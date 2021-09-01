@@ -103,7 +103,7 @@ class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScr
                         onTap: () async {
                           try {
                             ref.read(isLoading).state = true;
-                            final senderId = ref.read(UserProvider.provider)?.id ?? '';
+                            final senderId = ref.read(UserProvider.provider)?.user?.id ?? '';
                             final pairingId = pairing?.id ?? '';
                             final messageContent = _messageController.text;
                             final messageType = (messageContent.trim().isEmpty)

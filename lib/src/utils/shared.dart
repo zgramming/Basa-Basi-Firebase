@@ -43,7 +43,7 @@ String compareDateMessage(DateTime date) {
 bool isStillTyping(DateTime now, DateTime? lastTyping) {
   final _lastTyping = lastTyping ?? DateTime.now();
   final diff = _lastTyping.add(const Duration(seconds: 5)).difference(now).inSeconds;
-  return diff <= 0;
+  return diff >= 0;
 }
 
 /**

@@ -48,7 +48,7 @@ class AccountScreen extends ConsumerWidget {
                           child: InkWell(
                             child: Builder(
                               builder: (context) {
-                                final user = ref.watch(UserProvider.provider);
+                                final user = ref.watch(UserProvider.provider)?.user;
                                 Widget image;
 
                                 if (user?.photoUrl.isEmpty ?? true) {
@@ -79,7 +79,7 @@ class AccountScreen extends ConsumerWidget {
                       ),
                       Builder(
                         builder: (context) {
-                          final user = ref.watch(UserProvider.provider);
+                          final user = ref.watch(UserProvider.provider)?.user;
                           return Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [

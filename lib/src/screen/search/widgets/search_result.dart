@@ -81,7 +81,7 @@ class _SearchResultState extends ConsumerState<SearchResult> with AutomaticKeepA
                               child: Center(
                                 child: ElevatedButton.icon(
                                   onPressed: () async {
-                                    final userLogin = ref.read(UserProvider.provider);
+                                    final userLogin = ref.read(UserProvider.provider)?.user;
                                     final channelMessage = getConversationID(
                                       senderId: userLogin?.id ?? '',
                                       pairingId: pairing.id,

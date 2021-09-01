@@ -19,7 +19,7 @@ class MessageDetailScreenContent extends StatelessWidget {
     return Expanded(
       child: Consumer(
         builder: (context, ref, child) {
-          final senderId = ref.watch(UserProvider.provider)?.id ?? '';
+          final senderId = ref.watch(UserProvider.provider)?.user?.id ?? '';
           final _streamMessage = ref.watch(getMessage(pairingId));
           return _streamMessage.when(
             data: (val) {
