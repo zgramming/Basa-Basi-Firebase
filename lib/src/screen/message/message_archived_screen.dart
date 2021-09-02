@@ -81,9 +81,12 @@ class MessageArchivedScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final recent = recents[index];
 
-              return MessageRecentItem(
-                recent: recent,
-                userLogin: userLogin,
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: MessageRecentItem(
+                  recent: recent,
+                  userLogin: userLogin,
+                ),
               );
             },
           );

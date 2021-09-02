@@ -23,38 +23,26 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colorPallete.primaryColor,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Stack(
-          children: [
-            // const Center(
-            //   child: CircularProgressIndicator(
-            //     color: Colors.white,
-            //   ),
-            // ),
-            Consumer(
-              builder: (context, ref, child) {
-                final _readSession = ref.watch(initializeApplication);
-                return _readSession.when(
-                  data: (value) {
-                    if (!value.alreadyOnboarding) {
-                      return const Introduction();
-                    } else if (value.user == null) {
-                      return const LoginScreen();
-                    } else {
-                      return const WelcomeScreen();
-                    }
-                  },
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (error, stackTrace) {
-                    log('error splash screen $stackTrace');
-                    return Positioned.fill(child: Center(child: Text(error.toString())));
-                  },
-                );
-              },
-            )
-          ],
-        ),
+      body: Consumer(
+        builder: (context, ref, child) {
+          final _readSession = ref.watch(initializeApplication);
+          return _readSession.when(
+            data: (value) {
+              if (!value.alreadyOnboarding) {
+                return const Introduction();
+              } else if (value.user == null) {
+                return const LoginScreen();
+              } else {
+                return const WelcomeScreen();
+              }
+            },
+            loading: () => const Center(child: CircularProgressIndicator(color: Colors.white)),
+            error: (error, stackTrace) {
+              log('error splash screen $stackTrace');
+              return Center(child: Text(error.toString()));
+            },
+          );
+        },
       ),
     );
   }

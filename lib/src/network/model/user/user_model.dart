@@ -13,6 +13,7 @@ class UserModel extends Equatable {
     this.email = 'nulled',
     this.photoUrl = 'nulled',
     this.isLogin = false,
+    this.tokenFirebase,
     this.loginAt,
     this.logoutAt,
   });
@@ -22,6 +23,7 @@ class UserModel extends Equatable {
   final String email;
   final String photoUrl;
   final bool isLogin;
+  final String? tokenFirebase;
   final DateTime? loginAt;
   final DateTime? logoutAt;
 
@@ -29,13 +31,14 @@ class UserModel extends Equatable {
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
   @override
-  List get props {
+  List<Object?> get props {
     return [
       id,
       name,
       email,
       photoUrl,
       isLogin,
+      tokenFirebase,
       loginAt,
       logoutAt,
     ];
@@ -50,6 +53,7 @@ class UserModel extends Equatable {
     String? email,
     String? photoUrl,
     bool? isLogin,
+    String? tokenFirebase,
     DateTime? loginAt,
     DateTime? logoutAt,
   }) {
@@ -59,6 +63,7 @@ class UserModel extends Equatable {
       email: email ?? this.email,
       photoUrl: photoUrl ?? this.photoUrl,
       isLogin: isLogin ?? this.isLogin,
+      tokenFirebase: tokenFirebase ?? this.tokenFirebase,
       loginAt: loginAt ?? this.loginAt,
       logoutAt: logoutAt ?? this.logoutAt,
     );

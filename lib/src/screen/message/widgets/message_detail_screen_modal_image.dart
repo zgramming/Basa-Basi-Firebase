@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,9 +9,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:basa_basi/src/network/network.dart';
-import 'package:basa_basi/src/provider/provider.dart';
-import 'package:basa_basi/src/utils/utils.dart';
+import '../../../network/network.dart';
+import '../../../provider/provider.dart';
+import '../../../utils/utils.dart';
 
 class MessageDetailScreenModalImage extends ConsumerStatefulWidget {
   final XFile file;
@@ -26,8 +25,6 @@ class MessageDetailScreenModalImage extends ConsumerStatefulWidget {
 }
 
 class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScreenModalImage> {
-  final FirebaseDatabase _database = FirebaseDatabase();
-
   final _messageFocusNode = FocusNode();
   final _messageController = TextEditingController();
 
@@ -39,10 +36,8 @@ class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScr
   void initState() {
     SystemChrome.setEnabledSystemUIOverlays([]);
     final _idPairing = ref.read(pairingId).state;
-    _database.reference().child('users/$_idPairing').get().then((snapshot) {
-      final user = snapshot.value as Map;
-      pairing = UserModel.fromJson(Map<String, dynamic>.from(user));
-      setState(() {});
+    ref.read(ChatsMessageProvider.provider.notifier).getUserByID(_idPairing).then((value) {
+      pairing = value;
     });
 
     super.initState();
@@ -71,13 +66,19 @@ class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScr
         child: Stack(
           children: [
             SizedBox.expand(
-              child: Image.file(
-                File(widget.file.path),
-                fit: BoxFit.contain,
+              child: InteractiveViewer(
+                panEnabled: false,
+                boundaryMargin: const EdgeInsets.all(100),
+                minScale: 0.5,
+                maxScale: 2,
+                child: Image.file(
+                  File(widget.file.path),
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             Positioned(
-              bottom: 40,
+              bottom: 50,
               left: 20,
               right: 20,
               child: KeyboardVisibilityBuilder(
@@ -96,6 +97,8 @@ class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScr
                           minLines: 1,
                           padding: const EdgeInsets.all(16.0),
                           radius: 30,
+                          hintText: 'Deskripsi gambar',
+                          hintStyle: const TextStyle(fontSize: 11.0),
                         ),
                       ),
                       const SizedBox(width: 15),
@@ -103,8 +106,8 @@ class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScr
                         onTap: () async {
                           try {
                             ref.read(isLoading).state = true;
-                            final senderId = ref.read(UserProvider.provider)?.user?.id ?? '';
-                            final pairingId = pairing?.id ?? '';
+                            final sender = ref.read(UserProvider.provider)?.user;
+
                             final messageContent = _messageController.text;
                             final messageType = (messageContent.trim().isEmpty)
                                 ? MessageType.onlyImage
@@ -128,8 +131,8 @@ class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScr
                             log('UrlFile $urlFile');
 
                             await ref.read(ChatsMessageProvider.provider.notifier).sendMessage(
-                                  senderId: senderId,
-                                  pairingId: pairingId,
+                                  sender: sender,
+                                  pairing: pairing,
                                   messageContent: messageContent,
                                   messageType: messageType,
                                   urlFile: urlFile,

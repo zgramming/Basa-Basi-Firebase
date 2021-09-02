@@ -13,6 +13,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) {
     email: json['email'] as String,
     photoUrl: json['photo_url'] as String,
     isLogin: json['is_login'] as bool,
+    tokenFirebase: json['token_firebase'] as String?,
     loginAt: json['login_at'] == null
         ? null
         : DateTime.parse(json['login_at'] as String),
@@ -28,6 +29,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'email': instance.email,
       'photo_url': instance.photoUrl,
       'is_login': instance.isLogin,
+      'token_firebase': instance.tokenFirebase,
       'login_at': instance.loginAt?.toIso8601String(),
       'logout_at': instance.logoutAt?.toIso8601String(),
     };

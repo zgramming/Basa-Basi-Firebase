@@ -21,7 +21,10 @@ class MessageDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => Future.value(false),
+      onWillPop: () async {
+        Navigator.of(context).pop();
+        return Future.value(false);
+      },
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,

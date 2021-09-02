@@ -30,114 +30,110 @@ class MessageRecentItem extends StatelessWidget {
         final _userFuture = ref.watch(searchUserById(recent.pairingId ?? ''));
         return _userFuture.when(
           data: (pairing) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Stack(
-                children: [
-                  InkWell(
-                    onLongPress: () =>
-                        ref.read(SelectedRecentChatProvider.provider.notifier).add(recent),
-                    onTap: () async {
-                      final isEmptySelectedRecentChat =
-                          ref.read(SelectedRecentChatProvider.provider).items.isEmpty;
-                      if (!isEmptySelectedRecentChat) {
-                        ref.read(SelectedRecentChatProvider.provider.notifier).add(recent);
-                      } else {
-                        try {
-                          final senderId = ref.read(UserProvider.provider)?.user?.id ?? '';
-                          final channelMessage = getConversationID(
-                            senderId: senderId,
-                            pairingId: pairing.id,
-                          );
-                          await ref
-                              .read(ChatsRecentProvider.provider.notifier)
-                              .resetUnreadMessageCount(
-                                userLogin: senderId,
-                                pairingId: pairing.id,
-                                channelMessage: channelMessage,
-                              );
+            return Stack(
+              children: [
+                InkWell(
+                  onLongPress: () =>
+                      ref.read(SelectedRecentChatProvider.provider.notifier).add(recent),
+                  onTap: () async {
+                    final isEmptySelectedRecentChat =
+                        ref.read(SelectedRecentChatProvider.provider).items.isEmpty;
+                    if (!isEmptySelectedRecentChat) {
+                      ref.read(SelectedRecentChatProvider.provider.notifier).add(recent);
+                    } else {
+                      try {
+                        final senderId = ref.read(UserProvider.provider)?.user?.id ?? '';
+                        final channelMessage = getConversationID(
+                          senderId: senderId,
+                          pairingId: pairing.id,
+                        );
+                        await ref
+                            .read(ChatsRecentProvider.provider.notifier)
+                            .resetUnreadMessageCount(
+                              userLogin: senderId,
+                              pairingId: pairing.id,
+                              channelMessage: channelMessage,
+                            );
 
-                          ///TODO Save pairing ID to global provider, then we can use on anywhere screen
-                          ref.read(pairingId).state = pairing.id;
+                        ///TODO Save pairing ID to global provider, then we can use on anywhere screen
+                        ref.read(pairingId).state = pairing.id;
 
-                          Future.delayed(
-                            const Duration(milliseconds: 50),
-                            () => Navigator.of(context).pushNamed(
-                              MessageDetailScreen.routeNamed,
-                              arguments: pairing,
-                            ),
-                          );
-                        } catch (e) {
-                          log(e.toString());
-                          GlobalFunction.showSnackBar(
-                            context,
-                            snackBarType: SnackBarType.error,
-                            content: Text(
-                              e.toString(),
-                            ),
-                          );
-                        }
+                        Future.delayed(
+                          const Duration(milliseconds: 50),
+                          () => Navigator.of(context).pushNamed(
+                            MessageDetailScreen.routeNamed,
+                            arguments: pairing,
+                          ),
+                        );
+                      } catch (e) {
+                        log('Error');
+                        GlobalFunction.showSnackBar(
+                          context,
+                          snackBarType: SnackBarType.error,
+                          content: Text(
+                            e.toString(),
+                          ),
+                        );
                       }
-                    },
-                    child: Ink(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10.0),
-                        boxShadow: const [
-                          BoxShadow(color: Colors.black26),
-                          BoxShadow(offset: Offset(0, 1), color: Colors.black26),
-                        ],
+                    }
+                  },
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black26),
+                        BoxShadow(offset: Offset(0, 1), color: Colors.black26),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 24.0,
+                        horizontal: 12.0,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 24.0,
-                          horizontal: 12.0,
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            MessageRecentItemImage(pairing: pairing, recent: recent),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  MessageRecentItemNameAndTime(
-                                    recent: recent,
-                                    pairing: pairing,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      if (recent.senderId == (userLogin?.id ?? '')) ...[
-                                        CircleAvatar(
-                                          radius: 5,
-                                          backgroundColor:
-                                              recent.messageStatus == MessageStatus.read
-                                                  ? colorPallete.accentColor
-                                                  : Colors.grey,
-                                        ),
-                                        const SizedBox(width: 5),
-                                      ],
-                                      MessageRecentItemListenTyping(
-                                        recent: recent,
-                                        pairing: pairing,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          MessageRecentItemImage(pairing: pairing, recent: recent),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                MessageRecentItemNameAndTime(
+                                  recent: recent,
+                                  pairing: pairing,
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    if (recent.senderId == (userLogin?.id ?? '')) ...[
+                                      CircleAvatar(
+                                        radius: 5,
+                                        backgroundColor: recent.messageStatus == MessageStatus.read
+                                            ? colorPallete.accentColor
+                                            : Colors.grey,
                                       ),
-                                      const SizedBox(height: 15),
-                                      if ((recent.countUnreadMessage ?? 0) > 0)
-                                        MessageRecentItemCountUnread(recent: recent),
+                                      const SizedBox(width: 5),
                                     ],
-                                  ),
-                                ],
-                              ),
+                                    MessageRecentItemListenTyping(
+                                      recent: recent,
+                                      pairing: pairing,
+                                    ),
+                                    const SizedBox(height: 15),
+                                    if ((recent.countUnreadMessage ?? 0) > 0)
+                                      MessageRecentItemCountUnread(recent: recent),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),

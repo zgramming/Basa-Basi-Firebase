@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,10 +11,12 @@ class ChatsMessageProvider extends StateNotifier<ChatsMessageState> {
   static final provider = StateNotifierProvider<ChatsMessageProvider, ChatsMessageState>(
       (ref) => ChatsMessageProvider());
 
-  final _database = FirebaseDatabase.instance.reference();
-  final ChatsRecentProvider _chatsRecentProvider = ChatsRecentProvider();
   // ignore: constant_identifier_names
   static const CHATS_MESSAGE_PATH = 'chats_message';
+
+  final _database = FirebaseDatabase.instance.reference();
+  final _notificationHelper = NotificationHelper();
+  final _chatsRecentProvider = ChatsRecentProvider();
 
   ChatsMessageProvider() : super(const ChatsMessageState());
 
@@ -21,7 +25,8 @@ class ChatsMessageProvider extends StateNotifier<ChatsMessageState> {
 
     // log('result ${result.value}');
     final messageStream = chatsReference.onValue;
-    return messageStream.map((event) {
+
+    final result = messageStream.map((event) {
       if (event.snapshot.value != null) {
         final value = event.snapshot.value;
         final messageMap = Map<String, dynamic>.from(value as Map);
@@ -35,44 +40,66 @@ class ChatsMessageProvider extends StateNotifier<ChatsMessageState> {
       }
       return <ChatsMessageModel>[];
     });
+
+    return result;
   }
 
-  Future<String> sendMessage({
-    required String senderId,
-    required String pairingId,
-    required String messageContent,
-    String messageReplyId = '',
-    MessageType messageType = MessageType.onlyText,
-    String urlFile = '',
-  }) async {
+  Future<UserModel> getUserByID(String id) async {
+    final result = await _database.reference().child('users/$id').get();
+    final map = result.value as Map;
+    final user = UserModel.fromJson(Map<String, dynamic>.from(map));
+    return user;
+  }
+
+  Future<String> sendMessage(
+      {required UserModel? sender,
+      required UserModel? pairing,
+      required String messageContent,
+      String messageReplyId = '',
+      MessageType messageType = MessageType.onlyText,
+      String urlFile = '',
+      List<String> listMessage = const []}) async {
     try {
-      final channelMessage = getConversationID(senderId: senderId, pairingId: pairingId);
+      final channelMessage =
+          getConversationID(senderId: sender?.id ?? '', pairingId: pairing?.id ?? '');
 
       final messageReference = _database.child('chats_message/$channelMessage').push();
       final id = messageReference.key;
 
       final messageDate = DateTime.now().millisecondsSinceEpoch;
+      final message = ChatsMessageModel(
+        id: id,
+        senderId: sender?.id ?? '',
+        pairingId: pairing?.id ?? '',
+        messageContent: messageContent,
+        messageDate: DateTime.now(),
+        messageReplyId: '',
+        messageStatus: MessageStatus.send,
+        messageType: messageType,
+        channelMessage: channelMessage,
+        urlFile: urlFile,
+      );
 
-      await messageReference.set({
-        'id': id,
-        'sender_id': senderId,
-        'pairing_id': pairingId,
-        'message_content': messageContent,
-        'message_date': messageDate,
-        'message_type': MessageTypeValues[messageType],
-        'message_status': MessageStatusValues[MessageStatus.send],
-        'message_reply_id': messageReplyId,
-        'channel_message': channelMessage,
-        'url_file': urlFile,
-      });
+      await messageReference.set(message.toJson());
+
       await _chatsRecentProvider.saveRecentMessage(
         id: id,
         channelMessage: channelMessage,
-        pairingId: pairingId,
-        senderId: senderId,
+        pairingId: pairing?.id ?? '',
+        senderId: sender?.id ?? '',
         messageContent: messageContent,
         messageDate: messageDate,
         messageType: messageType,
+      );
+
+      _notificationHelper.sendSingleNotificationFirebase(
+        pairing?.tokenFirebase ?? '',
+        title: sender?.name ?? '',
+        body: messageContent,
+        paramData: {
+          'sender': jsonEncode(sender),
+          'messages': jsonEncode(listMessage),
+        },
       );
       return id;
     } catch (e) {

@@ -250,7 +250,8 @@ class AccountScreen extends ConsumerWidget {
                       ),
                       AccountMenuItem(
                         onTap: () async {
-                          await ref.read(UserProvider.provider.notifier).signOut();
+                          final user = ref.read(UserProvider.provider)?.user;
+                          await ref.read(UserProvider.provider.notifier).signOut(user!);
                           Navigator.of(context).pushReplacementNamed(LoginScreen.routeNamed);
                         },
                         icon: FeatherIcons.logOut,

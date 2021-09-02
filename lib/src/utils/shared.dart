@@ -1,5 +1,14 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:global_template/functions/global_function.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../screen/message/widgets/message_detail_screen_modal_image.dart';
+
+final ImagePicker _picker = ImagePicker();
 
 String getConversationID({required String senderId, required String pairingId}) {
   if (senderId.hashCode <= pairingId.hashCode) {
@@ -40,12 +49,47 @@ String compareDateMessage(DateTime date) {
   }
 }
 
-bool isStillTyping(DateTime now, DateTime? lastTyping) {
-  final _lastTyping = lastTyping ?? DateTime.now();
-  final diff = _lastTyping.add(const Duration(seconds: 5)).difference(now).inSeconds;
-  return diff >= 0;
+bool isStillTyping(DateTime? lastTyping) {
+  if (lastTyping != null) {
+    final diff = lastTyping.add(const Duration(seconds: 5)).difference(DateTime.now()).inSeconds;
+    log('diff $diff');
+    return diff >= 0;
+  }
+  return false;
 }
 
+Future<void> uploadImage(
+  BuildContext context, {
+  ImageSource source = ImageSource.gallery,
+}) async {
+  final file = await _picker.pickImage(
+    source: source,
+    // maxHeight: 300,
+    // maxWidth: 300,
+    imageQuality: 10,
+  );
+
+  if (file == null) {
+    log('Tidak menemukan gambar yang dipilih');
+    return;
+  }
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    enableDrag: false,
+    builder: (context) {
+      return MessageDetailScreenModalImage(file: file);
+    },
+  );
+}
+
+Future<File?> pickFile() async {
+  final FilePickerResult? result = await FilePicker.platform.pickFiles();
+  if (result == null) {
+    return null;
+  }
+  return File(result.files.single.path);
+}
 /**
  *  zfefry = 1
  *  kamu = 2

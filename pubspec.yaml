@@ -25,14 +25,18 @@ dependencies:
   cupertino_icons: ^1.0.2
   dio: ^4.0.0
   equatable: ^2.0.3
+  file_picker: ^4.0.1
   firebase_core: ^1.6.0
   firebase_database: ^7.2.1
+  firebase_messaging: ^10.0.6
   firebase_storage: ^10.0.3
   flutter:
     sdk: flutter
   flutter_feather_icons: ^2.0.0+1
+  flutter_local_notifications: ^8.1.1+2
   flutter_localizations:
     sdk: flutter
+  flutter_native_timezone: ^2.0.0
   flutter_riverpod: 1.0.0-dev.7
   global_template:
     path: global_template

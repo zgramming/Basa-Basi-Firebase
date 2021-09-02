@@ -42,11 +42,12 @@ class _MessageDetailScreenListenTypingState extends State<MessageDetailScreenLis
         final _streamTyping = ref.watch(listenRecentMessage(_pairingId));
         return _streamTyping.when(
           data: (message) {
+            final lastTypingDate = message.lastTypingDate;
             return AnimatedSwitcher(
               duration: const Duration(milliseconds: 500),
               switchInCurve: Curves.bounceIn,
               switchOutCurve: Curves.bounceOut,
-              child: (isStillTyping(DateTime.now(), message.lastTypingDate))
+              child: (isStillTyping(lastTypingDate))
                   ? Align(
                       alignment: Alignment.centerLeft,
                       child: Text(

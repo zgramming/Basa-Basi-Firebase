@@ -1,13 +1,21 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:basa_basi/src/network/model/user/user_model.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 
 import '../../provider/provider.dart';
+import '../../utils/utils.dart';
 
 import '../account/account_screen.dart';
 import '../message/message_screen.dart';
-import 'widgets/welcome_screen_appbar_action.dart';
+
+import './widgets/welcome_screen_appbar_action.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const routeNamed = '/welcome-screen';
@@ -18,11 +26,69 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  final NotificationHelper _notificationHelper = NotificationHelper();
+
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
+
+    /// Listen Foreground firebase messaging
+    FirebaseMessaging.onMessage.listen((event) {
+      log('foreground firebase messaging');
+      log('Event foreground firebase messaging : ${event.data}');
+      final messages = List<String>.from(jsonDecode(event.data['messages'] as String) as List);
+      final decodeSender = jsonDecode(event.data['sender'] as String) as Map<String, dynamic>;
+      final sender = UserModel.fromJson(decodeSender);
+      final person = Person(key: sender.id, name: sender.name);
+      final _list = <Message>[];
+
+      for (final message in messages) {
+        _list.add(Message(message, DateTime.now(), person));
+      }
+
+      _notificationHelper.showSingleConversationNotification(
+        sender.id.hashCode,
+        pairing: person,
+        messages: _list,
+      );
+    });
+
+    /// Listen OnOpenedApp firebase messaging
+    FirebaseMessaging.onMessageOpenedApp.listen((event) {
+      log('foreground firebase messaging');
+      log('Event foreground firebase messaging : ${event.data}');
+      final messages = List<String>.from(jsonDecode(event.data['messages'] as String) as List);
+      final decodeSender = jsonDecode(event.data['sender'] as String) as Map<String, dynamic>;
+      final sender = UserModel.fromJson(decodeSender);
+      final person = Person(key: sender.id, name: sender.name);
+      final _list = <Message>[];
+
+      for (final message in messages) {
+        _list.add(Message(message, DateTime.now(), person));
+      }
+
+      _notificationHelper.showSingleConversationNotification(
+        sender.id.hashCode,
+        pairing: person,
+        messages: _list,
+      );
+    });
+
+    /// Listen background firebase messaging
+    _notificationHelper.configureDidReceiveLocalNotificationSubject(
+      context,
+      WelcomeScreen.routeNamed,
+    );
+    _notificationHelper.configureSelectNotificationSubject(context);
+  }
+
+  @override
+  void dispose() {
+    didReceiveLocalNotificationSubject.close();
+    selectNotificationSubject.close();
+    super.dispose();
   }
 
   final screens = const <Widget>[
@@ -52,7 +118,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             );
           },
         ),
-        actions: const [
+        actions: [
           WelcomeScreenAppbarAction(),
         ],
       ),

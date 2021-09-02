@@ -58,6 +58,7 @@ class MessageDetailScreenList extends StatelessWidget {
       case MessageType.voice:
         break;
       case MessageType.file:
+        widget = const Text('File');
         break;
       default:
     }

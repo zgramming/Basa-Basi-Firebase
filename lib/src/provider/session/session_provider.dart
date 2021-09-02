@@ -16,8 +16,6 @@ class SessionProvider extends StateNotifier<SessionState> {
 
   SessionProvider() : super(const SessionState());
 
-  final _userProvider = UserProvider();
-
   Future<void> setLoginSession({required UserModel? value}) async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     await pref.setString(Constant().userKey, json.encode(value));

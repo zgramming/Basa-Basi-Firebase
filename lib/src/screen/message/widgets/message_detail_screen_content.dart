@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:basa_basi/src/provider/provider.dart';
 import 'package:basa_basi/src/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ class MessageDetailScreenContent extends StatelessWidget {
         builder: (context, ref, child) {
           final senderId = ref.watch(UserProvider.provider)?.user?.id ?? '';
           final _streamMessage = ref.watch(getMessage(pairingId));
+          log('trigger');
           return _streamMessage.when(
             data: (val) {
               final messages = ref.watch(ChatsMessageProvider.provider).chatsByChannel(

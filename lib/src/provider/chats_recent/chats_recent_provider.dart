@@ -154,10 +154,7 @@ class ChatsRecentProvider extends StateNotifier<List<ChatsRecentModel>> {
 
       await messageReference.update({'message_status': MessageStatusValues[MessageStatus.read]});
       await pairingReference.update({'message_status': MessageStatusValues[MessageStatus.read]});
-      await senderReference.update({'count_unread_message': 0}).timeout(
-        const Duration(seconds: 5),
-        onTimeout: () => throw Exception('Sepertinya koneksi kamu tidak stabil ya...'),
-      );
+      await senderReference.update({'count_unread_message': 0});
 
       state = [
         for (final item in state)

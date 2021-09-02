@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -15,7 +16,6 @@ class UserProvider extends StateNotifier<UserState> {
 
   final _database = FirebaseDatabase();
   final _googleSignIn = GoogleSignIn();
-  final _sessionProvider = SessionProvider();
 
   static final provider = StateNotifierProvider<UserProvider, UserState?>((ref) => UserProvider());
 
@@ -30,6 +30,7 @@ class UserProvider extends StateNotifier<UserState> {
     final user = UserModel.fromJson(Map.from(getUser));
     state = state.setUser(user);
 
+    log('state ${state.user}');
     return user;
   }
 
@@ -54,15 +55,21 @@ class UserProvider extends StateNotifier<UserState> {
         photoUrl: account.photoUrl ?? '',
         isLogin: true,
         loginAt: DateTime.now(),
+        tokenFirebase: await FirebaseMessaging.instance.getToken(),
       );
+      await _database.reference().child("users/${user.id}").update(user.toJson());
       state = state.setUser(user);
     }
 
     return true;
   }
 
-  Future<void> signOut() async {
+  Future<void> signOut(UserModel user) async {
     await _googleSignIn.signOut();
+    //TODO: Uncommenct when production release
+    await _database.reference().child("users/${user.id}").update(
+      {'token_firebase': ''},
+    );
     state = state.reset();
   }
 
@@ -74,6 +81,7 @@ class UserProvider extends StateNotifier<UserState> {
       photoUrl: account?.photoUrl ?? '',
       isLogin: true,
       loginAt: DateTime.now(),
+      tokenFirebase: await FirebaseMessaging.instance.getToken(),
     );
     await _database.reference().child('users/${account?.id}').update(user.toJson());
 
