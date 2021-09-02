@@ -51,14 +51,15 @@ class ChatsMessageProvider extends StateNotifier<ChatsMessageState> {
     return user;
   }
 
-  Future<String> sendMessage(
-      {required UserModel? sender,
-      required UserModel? pairing,
-      required String messageContent,
-      String messageReplyId = '',
-      MessageType messageType = MessageType.onlyText,
-      String urlFile = '',
-      List<String> listMessage = const []}) async {
+  Future<String> sendMessage({
+    required UserModel? sender,
+    required UserModel? pairing,
+    required String messageContent,
+    String messageReplyId = '',
+    MessageType messageType = MessageType.onlyText,
+    String urlFile = '',
+    List<String> listMessage = const [],
+  }) async {
     try {
       final channelMessage =
           getConversationID(senderId: sender?.id ?? '', pairingId: pairing?.id ?? '');
@@ -92,15 +93,17 @@ class ChatsMessageProvider extends StateNotifier<ChatsMessageState> {
         messageType: messageType,
       );
 
-      _notificationHelper.sendSingleNotificationFirebase(
-        pairing?.tokenFirebase ?? '',
-        title: sender?.name ?? '',
-        body: messageContent,
-        paramData: {
-          'sender': jsonEncode(sender),
-          'messages': jsonEncode(listMessage),
-        },
-      );
+      if (pairing?.tokenFirebase != null) {
+        await _notificationHelper.sendSingleNotificationFirebase(
+          pairing?.tokenFirebase ?? '',
+          title: sender?.name ?? '',
+          body: messageContent,
+          paramData: {
+            'sender': jsonEncode(sender),
+            'messages': jsonEncode(listMessage),
+          },
+        );
+      }
       return id;
     } catch (e) {
       rethrow;
