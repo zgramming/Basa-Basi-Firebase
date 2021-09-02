@@ -133,9 +133,21 @@ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __
 
 # Konfigurasi
 
-1. 
-2. 
-3. 
+## 1. Generate google-service.json
+
+Saat mendownload/fork project ini, file **google-service.json** tidak tersedia, silakan baca intruksi pada link ini [https://firebase.google.com/docs/flutter/setup]
+
+## 2. Setting server key firebase
+ pada folder ***lib/src/utils/notification***, ubah `_serverKey` menggunakan key yang ada pada firebase console kamu. Bingung cara dapatnya dimana ? Tetap pada file ***lib/src/utils/notification*** lalu baca intruksi mulai dari line **18**
+
+## 3. Aktifkan service firebase realtime database, authentication dan storage
+
+Untuk saat ini, Project ini menggunakan 3 service pada firebase yaitu : 
+- Firebase Realtime Database
+- Authentication
+- Storage
+
+Diharapkan pada firebase console kamu, sudah mengaktifkan ketiga service ini terlebih dahulu.
 
 # Issues
 
@@ -144,9 +156,6 @@ Please file any issues, bugs or feature request as an issue on <a href="https://
 # Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-<br>
-
 
 <br>
 
