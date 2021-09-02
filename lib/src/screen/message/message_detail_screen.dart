@@ -66,11 +66,6 @@ class MessageDetailScreen extends StatelessWidget {
               ),
             ],
           ),
-          actions: [
-            PopupMenuButton(
-              itemBuilder: (context) => [const PopupMenuItem(child: Text('Hapus chat'))],
-            )
-          ],
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -58,7 +58,7 @@ class NotificationHelper {
   static const _channelDesc = "Basa Basi Channel";
   static const _firebaseMessagingUrl = 'https://fcm.googleapis.com/fcm/send';
   //TODO: Hidden when push to github
-  static const _serverKey = 'YOUR_SERVER_KEY_FIREBASE';
+  static const _serverKey = 'YOUR_API_KEY';
 
   static NotificationHelper? _instance;
 
@@ -505,7 +505,7 @@ class NotificationHelper {
       final Directory directory = await getApplicationDocumentsDirectory();
       final String filePath = '${directory.path}/$fileName.png';
       if (File(filePath).existsSync()) {
-        log('masuk sini');
+        log('File sudah ada, gunakan yang existing');
         return filePath;
       }
       // final http.Response response = await http.get(Uri.parse(url));

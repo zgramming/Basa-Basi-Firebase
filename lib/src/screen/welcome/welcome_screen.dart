@@ -41,18 +41,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       final messages = List<String>.from(jsonDecode(event.data['messages'] as String) as List);
       final decodeSender = jsonDecode(event.data['sender'] as String) as Map<String, dynamic>;
       final sender = UserModel.fromJson(decodeSender);
-      final person = Person(key: sender.id, name: sender.name);
-      final _list = <Message>[];
 
-      for (final message in messages) {
-        _list.add(Message(message, DateTime.now(), person));
-      }
+      _notificationHelper
+          .downloadAndSaveFile(sender.photoUrl, '${sender.id}_${sender.name}')
+          .then((urlFile) {
+        final person = Person(
+          key: sender.id,
+          name: sender.name,
+          icon: BitmapFilePathAndroidIcon(urlFile),
+        );
 
-      _notificationHelper.showSingleConversationNotification(
-        sender.id.hashCode,
-        pairing: person,
-        messages: _list,
-      );
+        final _list = <Message>[];
+
+        for (final message in messages) {
+          _list.add(Message(message, DateTime.now(), person));
+        }
+
+        _notificationHelper.showSingleConversationNotification(
+          sender.id.hashCode,
+          pairing: person,
+          messages: _list,
+        );
+      });
     });
 
     /// Listen OnOpenedApp firebase messaging
@@ -62,18 +72,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       final messages = List<String>.from(jsonDecode(event.data['messages'] as String) as List);
       final decodeSender = jsonDecode(event.data['sender'] as String) as Map<String, dynamic>;
       final sender = UserModel.fromJson(decodeSender);
-      final person = Person(key: sender.id, name: sender.name);
-      final _list = <Message>[];
 
-      for (final message in messages) {
-        _list.add(Message(message, DateTime.now(), person));
-      }
+      _notificationHelper
+          .downloadAndSaveFile(sender.photoUrl, '${sender.id}_${sender.name}')
+          .then((urlFile) {
+        final person = Person(
+          key: sender.id,
+          name: sender.name,
+          icon: BitmapFilePathAndroidIcon(urlFile),
+        );
 
-      _notificationHelper.showSingleConversationNotification(
-        sender.id.hashCode,
-        pairing: person,
-        messages: _list,
-      );
+        final _list = <Message>[];
+
+        for (final message in messages) {
+          _list.add(Message(message, DateTime.now(), person));
+        }
+
+        _notificationHelper.showSingleConversationNotification(
+          sender.id.hashCode,
+          pairing: person,
+          messages: _list,
+        );
+      });
     });
 
     /// Listen background firebase messaging
@@ -118,7 +138,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             );
           },
         ),
-        actions: [
+        actions: const [
           WelcomeScreenAppbarAction(),
         ],
       ),
