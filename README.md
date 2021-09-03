@@ -12,7 +12,7 @@
 # Basa Basi
 
 Mau Ngelindur, Ngelantur, Curhat, PDKT, Pinjam Uang ?
-Harus Basa-Basi dulu dong...
+Diawali dengan Basa-Basi
 
 # Preview Sekejap 
 
