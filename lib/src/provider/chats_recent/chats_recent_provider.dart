@@ -273,6 +273,7 @@ final getRecentMessage = StreamProvider.autoDispose<List<ChatsRecentModel>>((ref
 
 final recentMessageArchived =
     StateProvider.autoDispose.family<List<ChatsRecentModel>, bool>((ref, isArchived) {
+  final userLogin = ref.watch(UserProvider.provider)?.user;
   final result = ref.watch(ChatsRecentProvider.provider).where((element) {
     final bool archived;
     if (isArchived) {
@@ -280,7 +281,7 @@ final recentMessageArchived =
     } else {
       archived = false;
     }
-    return element.isArchived == archived;
+    return element.isArchived == archived && element.idUser == userLogin?.id;
   }).toList();
   return result;
 });
