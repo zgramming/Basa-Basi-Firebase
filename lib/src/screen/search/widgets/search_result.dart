@@ -82,21 +82,16 @@ class _SearchResultState extends ConsumerState<SearchResult> with AutomaticKeepA
                                 child: ElevatedButton.icon(
                                   onPressed: () async {
                                     final userLogin = ref.read(UserProvider.provider)?.user;
-                                    final channelMessage = getConversationID(
-                                      senderId: userLogin?.id ?? '',
-                                      pairingId: pairing.id,
-                                    );
 
                                     await ref
                                         .read(ChatsRecentProvider.provider.notifier)
                                         .resetUnreadMessageCount(
                                           userLogin: userLogin?.id ?? '',
                                           pairingId: pairing.id,
-                                          channelMessage: channelMessage,
                                         );
 
                                     ///TODO Save pairing ID to global provider, then we can use on anywhere screen
-                                    ref.read(pairingId).state = pairing.id;
+                                    ref.read(pairingGlobal).state = pairing;
                                     Future.delayed(const Duration(milliseconds: 200), () {
                                       Navigator.of(context).pushNamed(
                                         MessageDetailScreen.routeNamed,

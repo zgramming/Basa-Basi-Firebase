@@ -8,12 +8,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:global_template/global_template.dart';
-import 'package:rxdart/rxdart.dart';
-
-import 'package:timezone/timezone.dart' as tz;
+import 'package:path_provider/path_provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+import '../../../main.dart';
+import '../../network/network.dart';
+import '../../screen/login/login_screen.dart';
 
 /// Step send notification with API Firebase
 /// 1. Use this url API :  [https://fcm.googleapis.com/fcm/send]
@@ -49,63 +51,66 @@ class ReceivedNotification {
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
-final selectNotificationSubject = BehaviorSubject<String?>();
-final didReceiveLocalNotificationSubject = BehaviorSubject<ReceivedNotification>();
 
-class NotificationHelper {
+class NotificationHelperRevision {
+  static NotificationHelperRevision? _instance;
+  factory NotificationHelperRevision() => _instance ?? NotificationHelperRevision._internal();
+  NotificationHelperRevision._internal() {
+    _instance = this;
+  }
+
   static const _channelId = "01";
   static const _channelName = "channel_01";
   static const _channelDesc = "Basa Basi Channel";
   static const _firebaseMessagingUrl = 'https://fcm.googleapis.com/fcm/send';
   //TODO: Hidden when push to github
-  static const _serverKey = 'YOUR_API_KEY';
-
-  static NotificationHelper? _instance;
+  static const _serverKey =
+      'AAAA1fmJsQ4:APA91bGi4km2b-m-xyzc3ydN9Lcdkv9LhXw0u10fvUQ7TNgo8B1qQ_H7q-TVJyCQZ7CmeOZN9-F9TALjAmfONaPNva2yKHFkTJHVucGHP0_CY8tB61fnUvQ5QRBX5kcDkekGSd-0CkxJ';
 
   static final _dio = Dio();
 
-  factory NotificationHelper() => _instance ?? NotificationHelper._internal();
-  NotificationHelper._internal() {
-    _instance = this;
-  }
+  Future<void> init() async {
+    await _configureLocalTimeZone();
 
-  Future<void> initNotifications(
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
-  ) async {
-    const initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
 
-    final initializationSettingsIOS = IOSInitializationSettings(
+    /// Note: permissions aren't requested here just to demonstrate that can be
+    /// done later
+    final IOSInitializationSettings initializationSettingsIOS = IOSInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+        onDidReceiveLocalNotification: (
+          int id,
+          String? title,
+          String? body,
+          String? payload,
+        ) async {
+          didReceiveLocalNotificationSubject.add(
+            ReceivedNotification(
+              id: id,
+              title: title,
+              body: body,
+              payload: payload,
+            ),
+          );
+        });
+    const MacOSInitializationSettings initializationSettingsMacOS = MacOSInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
-      onDidReceiveLocalNotification: (
-        int id,
-        String? title,
-        String? body,
-        String? payload,
-      ) async {
-        didReceiveLocalNotificationSubject.add(
-          ReceivedNotification(
-            id: id,
-            title: title,
-            body: body,
-            payload: payload,
-          ),
-        );
-      },
     );
 
-    final initializationSettings = InitializationSettings(
+    final InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
+      macOS: initializationSettingsMacOS,
     );
-
-    await _configureLocalTimeZone();
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: (
-      String? payload,
-    ) async {
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: (String? payload) async {
       if (payload != null) {
-        log('notification payload: $payload');
+        debugPrint('notification payload: $payload');
       }
       selectNotificationSubject.add(payload);
     });
@@ -117,7 +122,9 @@ class NotificationHelper {
     tz.setLocalLocation(tz.getLocation(timeZoneName));
   }
 
-  void requestIOSPermissions(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) {
+  /// Must Initialize in splashscreen/welcomescreen [1 | 2 | 3]
+  ///! 1.
+  void requestPermissions() {
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
@@ -125,23 +132,36 @@ class NotificationHelper {
           badge: true,
           sound: true,
         );
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
   }
 
-  void configureDidReceiveLocalNotificationSubject(BuildContext context, String route) {
-    didReceiveLocalNotificationSubject.stream.listen((
-      ReceivedNotification receivedNotification,
-    ) async {
+  ///TODO: Change this route location
+  ///! 2.
+  void configureDidReceiveLocalNotificationSubject(BuildContext context) {
+    didReceiveLocalNotificationSubject.stream
+        .listen((ReceivedNotification receivedNotification) async {
       await showDialog(
         context: context,
         builder: (BuildContext context) => CupertinoAlertDialog(
           title: receivedNotification.title != null ? Text(receivedNotification.title!) : null,
           content: receivedNotification.body != null ? Text(receivedNotification.body!) : null,
-          actions: [
+          actions: <Widget>[
             CupertinoDialogAction(
               isDefaultAction: true,
               onPressed: () async {
                 Navigator.of(context, rootNavigator: true).pop();
-                await Navigator.pushNamed(context, route, arguments: receivedNotification);
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext context) => const LoginScreen(),
+                  ),
+                );
               },
               child: const Text('Ok'),
             )
@@ -151,6 +171,25 @@ class NotificationHelper {
     });
   }
 
+  ///! 3.
+  void configureSelectNotificationSubject(
+    BuildContext context, {
+    required Function(UserModel pairing) onSelectNotification,
+  }) {
+    selectNotificationSubject.stream.listen((String? payload) async {
+      final length = payload?.length ?? 0;
+      if (length > 0) {
+        log('listen payload $payload');
+        final map = jsonDecode(payload!) as Map<String, dynamic>;
+        // final map = {"test": 'test'};
+        final pairing = UserModel.fromJson(Map<String, dynamic>.from(map));
+        onSelectNotification(pairing);
+        // Navigator.pushNamed(context, routeNamed);
+      }
+    });
+  }
+
+  ///* STAR FUNCTION SHOW NOTIFICATION
   Future<void> showNotification({
     required int id,
     required String title,
@@ -437,6 +476,7 @@ class NotificationHelper {
     int uniqId, {
     required Person pairing,
     required List<Message> messages,
+    String? payload,
   }) async {
     /// First two person objects will use icons that part of the Android app's
     /// drawable resources
@@ -496,6 +536,7 @@ class NotificationHelper {
       '',
       '',
       platformChannelSpecifics,
+      payload: payload,
     );
   }
 
@@ -528,8 +569,19 @@ class NotificationHelper {
     String tokenFirebase, {
     required String title,
     required String body,
+    required String payload,
     Map<String, dynamic> paramData = const {},
   }) async {
+    final defaultParam = {
+      "title": title,
+      "body": body,
+      'payload': payload,
+      "click_action": "FLUTTER_NOTIFICATION_CLICK",
+      "sound": "default",
+      ...paramData,
+    };
+
+    log('defaultParam $defaultParam');
     try {
       final _data = {
         'to': tokenFirebase,
@@ -537,7 +589,7 @@ class NotificationHelper {
           'title': title,
           'body': body,
         },
-        'data': paramData,
+        'data': defaultParam,
         'priority': 'high'
       };
       final response = await _dio.post(
@@ -592,21 +644,5 @@ class NotificationHelper {
     }
   }
 
-  void configureSelectNotificationSubject(
-    BuildContext context, {
-    String routeNamed = '',
-  }) {
-    selectNotificationSubject.stream.listen((String? payload) async {
-      if (payload != null) {
-        log('log payload $payload ');
-
-        return;
-      } else {
-        Navigator.of(context).pushReplacementNamed(routeNamed);
-        return;
-      }
-    });
-  }
+  ///* END FUNCTION SHOW NOTIFICATION
 }
-
-class PersonNotification {}

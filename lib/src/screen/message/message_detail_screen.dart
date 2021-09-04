@@ -2,21 +2,38 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
 
 import '../../network/network.dart';
+import '../../provider/provider.dart';
 
 import './widgets/message_detail_screen_content.dart';
 import './widgets/message_detail_screen_footer.dart';
-import 'widgets/message_detail_screen_listen_typing.dart';
+import './widgets/message_detail_screen_listen_typing.dart';
 
-class MessageDetailScreen extends StatelessWidget {
+class MessageDetailScreen extends ConsumerStatefulWidget {
   static const routeNamed = '/message-detail-screen';
-  final UserModel? pairing;
   const MessageDetailScreen({
     Key? key,
-    required this.pairing,
   }) : super(key: key);
+
+  @override
+  _MessageDetailScreenState createState() => _MessageDetailScreenState();
+}
+
+class _MessageDetailScreenState extends ConsumerState<MessageDetailScreen> {
+  late final UserModel pairing;
+  @override
+  void initState() {
+    ///* Every user enter message screen, reset previous temporary messages
+    super.initState();
+    pairing = ref.read(pairingGlobal).state!;
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      // Add Your Code here.
+      ref.read(tempListMessages.notifier).clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +63,7 @@ class MessageDetailScreen extends StatelessWidget {
                       ),
                       child: ClipOval(
                         child: Image.network(
-                          pairing?.photoUrl ?? '',
+                          pairing.photoUrl,
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -59,7 +76,7 @@ class MessageDetailScreen extends StatelessWidget {
                 constraints: const BoxConstraints(maxWidth: 200),
                 child: Column(
                   children: [
-                    Align(alignment: Alignment.centerLeft, child: Text(pairing?.name ?? '')),
+                    Align(alignment: Alignment.centerLeft, child: Text(pairing.name)),
                     const MessageDetailScreenListenTyping(),
                   ],
                 ),
@@ -70,7 +87,7 @@ class MessageDetailScreen extends StatelessWidget {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            MessageDetailScreenContent(pairingId: pairing?.id ?? ''),
+            MessageDetailScreenContent(pairingId: pairing.id),
             const SizedBox(height: 10.0),
             MessageDetailScreenFooter(),
             const SizedBox(height: 10.0),

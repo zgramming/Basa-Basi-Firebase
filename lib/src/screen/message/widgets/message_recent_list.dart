@@ -23,7 +23,6 @@ class _MessageRecentsListState extends State<MessageRecentsList> {
 
   @override
   void initState() {
-    log('init timer welcome page');
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       setState(() {});
       log('refresh timer welcome page');
@@ -34,7 +33,7 @@ class _MessageRecentsListState extends State<MessageRecentsList> {
   @override
   void dispose() {
     _timer?.cancel();
-    log('dispose timer welcome page');
+    log('dispose timer welcome screen');
     super.dispose();
   }
 

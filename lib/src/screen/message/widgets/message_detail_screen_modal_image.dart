@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:basa_basi/src/provider/global/global_provider.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,15 +31,12 @@ class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScr
 
   final debouncer = Debouncer(milliseconds: 500);
 
-  UserModel? pairing;
+  late final UserModel pairing;
 
   @override
   void initState() {
+    pairing = ref.read(pairingGlobal).state!;
     SystemChrome.setEnabledSystemUIOverlays([]);
-    final _idPairing = ref.read(pairingId).state;
-    ref.read(ChatsMessageProvider.provider.notifier).getUserByID(_idPairing).then((value) {
-      pairing = value;
-    });
 
     super.initState();
   }
@@ -105,7 +103,12 @@ class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScr
                       InkWell(
                         onTap: () async {
                           try {
+                            ///* Start Loading
                             ref.read(isLoading).state = true;
+
+                            ///* Save message to temporary messages provider
+                            ref.read(tempListMessages.notifier).add("Mengirim gambar 📷");
+
                             final sender = ref.read(UserProvider.provider)?.user;
 
                             final messageContent = _messageController.text;
@@ -130,19 +133,23 @@ class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScr
                             final urlFile = (await reference.getDownloadURL()).toString();
                             log('UrlFile $urlFile');
 
+                            final tempMessages = ref.read(tempListMessages);
                             await ref.read(ChatsMessageProvider.provider.notifier).sendMessage(
                                   sender: sender,
                                   pairing: pairing,
                                   messageContent: messageContent,
                                   messageType: messageType,
                                   urlFile: urlFile,
+                                  listMessage: tempMessages,
                                 );
 
                             Navigator.of(context).pop();
                           } catch (e) {
+                            ///* END Loading
                             log('error ${e.toString()}');
                             ref.read(isLoading).state = false;
                           } finally {
+                            ///* END Loading
                             ref.read(isLoading).state = false;
                           }
                         },
@@ -173,28 +180,26 @@ class _MessageDetailScreenModalImageState extends ConsumerState<MessageDetailScr
                 title: InkWell(
                   onTap: () => Navigator.of(context).pop(),
                   borderRadius: BorderRadius.circular(30.0),
-                  child: (pairing == null)
-                      ? const SizedBox()
-                      : Row(
-                          children: [
-                            const Icon(FeatherIcons.arrowLeft),
-                            const SizedBox(width: 5),
-                            Ink(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: colorPallete.accentColor,
-                              ),
-                              child: ClipOval(
-                                child: Image.network(
-                                  pairing?.photoUrl ?? '',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ],
+                  child: Row(
+                    children: [
+                      const Icon(FeatherIcons.arrowLeft),
+                      const SizedBox(width: 5),
+                      Ink(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: colorPallete.accentColor,
                         ),
+                        child: ClipOval(
+                          child: Image.network(
+                            pairing.photoUrl,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )

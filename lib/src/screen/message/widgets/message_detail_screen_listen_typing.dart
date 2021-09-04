@@ -4,25 +4,26 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../network/network.dart';
 import '../../../provider/provider.dart';
 import '../../../utils/utils.dart';
 
-class MessageDetailScreenListenTyping extends StatefulWidget {
+class MessageDetailScreenListenTyping extends ConsumerStatefulWidget {
   const MessageDetailScreenListenTyping({Key? key}) : super(key: key);
 
   @override
   _MessageDetailScreenListenTypingState createState() => _MessageDetailScreenListenTypingState();
 }
 
-class _MessageDetailScreenListenTypingState extends State<MessageDetailScreenListenTyping> {
+class _MessageDetailScreenListenTypingState extends ConsumerState<MessageDetailScreenListenTyping> {
   Timer? _timer;
-
+  late final UserModel pairing;
   @override
   void initState() {
-    log('init timer');
+    pairing = ref.read(pairingGlobal).state!;
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      log('refresh timer Message Detail Listen Typing');
       setState(() {});
-      log('refresh timer');
     });
     super.initState();
   }
@@ -30,7 +31,7 @@ class _MessageDetailScreenListenTypingState extends State<MessageDetailScreenLis
   @override
   void dispose() {
     _timer?.cancel();
-    log('dispose timer');
+    log('dispose timer Message Detail Listen Typing');
     super.dispose();
   }
 
@@ -38,8 +39,7 @@ class _MessageDetailScreenListenTypingState extends State<MessageDetailScreenLis
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, child) {
-        final _pairingId = ref.watch(pairingId).state;
-        final _streamTyping = ref.watch(listenRecentMessage(_pairingId));
+        final _streamTyping = ref.watch(listenRecentMessage(pairing.id));
         return _streamTyping.when(
           data: (message) {
             final lastTypingDate = message.lastTypingDate;

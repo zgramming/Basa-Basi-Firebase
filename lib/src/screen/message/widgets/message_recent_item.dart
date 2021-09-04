@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:basa_basi/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:global_template/global_template.dart';
@@ -43,27 +42,20 @@ class MessageRecentItem extends StatelessWidget {
                     } else {
                       try {
                         final senderId = ref.read(UserProvider.provider)?.user?.id ?? '';
-                        final channelMessage = getConversationID(
-                          senderId: senderId,
-                          pairingId: pairing.id,
-                        );
+
                         await ref
                             .read(ChatsRecentProvider.provider.notifier)
                             .resetUnreadMessageCount(
                               userLogin: senderId,
                               pairingId: pairing.id,
-                              channelMessage: channelMessage,
                             );
 
-                        ///TODO Save pairing ID to global provider, then we can use on anywhere screen
-                        ref.read(pairingId).state = pairing.id;
+                        ///TODO Save pairing model to global provider, then we can use on anywhere screen
+                        ref.read(pairingGlobal).state = pairing;
 
                         Future.delayed(
                           const Duration(milliseconds: 50),
-                          () => Navigator.of(context).pushNamed(
-                            MessageDetailScreen.routeNamed,
-                            arguments: pairing,
-                          ),
+                          () => Navigator.of(context).pushNamed(MessageDetailScreen.routeNamed),
                         );
                       } catch (e) {
                         log('Error');

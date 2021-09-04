@@ -252,7 +252,8 @@ class AccountScreen extends ConsumerWidget {
                         onTap: () async {
                           final user = ref.read(UserProvider.provider)?.user;
                           await ref.read(UserProvider.provider.notifier).signOut(user!);
-                          Navigator.of(context).pushReplacementNamed(LoginScreen.routeNamed);
+                          await Navigator.pushNamedAndRemoveUntil(
+                              context, LoginScreen.routeNamed, (route) => route is LoginScreen);
                         },
                         icon: FeatherIcons.logOut,
                         title: 'Keluar',

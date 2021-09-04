@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_template/global_template.dart';
 
-import '../network/network.dart';
 import '../screen/introduction/introduction_screen.dart';
 import '../screen/login/login_screen.dart';
 import '../screen/message/message_archived_screen.dart';
@@ -31,10 +30,9 @@ class MyRoute {
           screen: (ctx, animation, secondaryAnimation) => const WelcomeScreen(),
         );
       case MessageDetailScreen.routeNamed:
-        final pairing = settings.arguments as UserModel?;
         return route.slideTransition(
           slidePosition: SlidePosition.fromRight,
-          screen: (ctx, animation, secondaryAnimation) => MessageDetailScreen(pairing: pairing),
+          screen: (ctx, animation, secondaryAnimation) => const MessageDetailScreen(),
         );
       case SearchScreen.routeNamed:
         return route.slideTransition(

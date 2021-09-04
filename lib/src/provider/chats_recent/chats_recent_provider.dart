@@ -137,8 +137,12 @@ class ChatsRecentProvider extends StateNotifier<List<ChatsRecentModel>> {
   Future<void> resetUnreadMessageCount({
     required String userLogin,
     required String pairingId,
-    required String channelMessage,
   }) async {
+    final channelMessage = getConversationID(
+      senderId: userLogin,
+      pairingId: pairingId,
+    );
+
     final senderReference =
         _database.child('${Constant().childChatsRecent}/$userLogin/$channelMessage');
     final pairingReference =

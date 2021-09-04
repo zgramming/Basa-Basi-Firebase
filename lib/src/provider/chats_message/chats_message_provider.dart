@@ -15,7 +15,7 @@ class ChatsMessageProvider extends StateNotifier<ChatsMessageState> {
   static const CHATS_MESSAGE_PATH = 'chats_message';
 
   final _database = FirebaseDatabase.instance.reference();
-  final _notificationHelper = NotificationHelper();
+  final _notificationHelper = NotificationHelperRevision();
   final _chatsRecentProvider = ChatsRecentProvider();
 
   ChatsMessageProvider() : super(const ChatsMessageState());
@@ -102,6 +102,7 @@ class ChatsMessageProvider extends StateNotifier<ChatsMessageState> {
             'sender': jsonEncode(sender),
             'messages': jsonEncode(listMessage),
           },
+          payload: 'payload messaging from ${sender?.name}',
         );
       }
       return id;

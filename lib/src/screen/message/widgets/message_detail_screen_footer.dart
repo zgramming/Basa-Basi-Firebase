@@ -12,18 +12,17 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
 import '../../../network/model/chats_message/chats_message_model.dart';
+import '../../../network/network.dart';
 import '../../../provider/provider.dart';
 import '../../../utils/constant.dart';
 import '../../../utils/utils.dart';
 
-class MessageDetailScreenFooter extends StatefulWidget {
+class MessageDetailScreenFooter extends ConsumerStatefulWidget {
   @override
   _MessageDetailScreenFooterState createState() => _MessageDetailScreenFooterState();
 }
 
-class _MessageDetailScreenFooterState extends State<MessageDetailScreenFooter> {
-  final List<String> _listMessages = [];
-
+class _MessageDetailScreenFooterState extends ConsumerState<MessageDetailScreenFooter> {
   bool _textFieldIsEmpty = true;
 
   final _messageFocusNode = FocusNode();
@@ -32,8 +31,10 @@ class _MessageDetailScreenFooterState extends State<MessageDetailScreenFooter> {
   final debouncer = Debouncer(milliseconds: 500);
   final _messageReplyId = '';
 
+  late final UserModel pairing;
   @override
   void initState() {
+    pairing = ref.read(pairingGlobal).state!;
     super.initState();
   }
 
@@ -53,16 +54,17 @@ class _MessageDetailScreenFooterState extends State<MessageDetailScreenFooter> {
                     return TextFormFieldCustom(
                       focusNode: _messageFocusNode,
                       controller: _messageController,
+                      hintText: 'Ketik pesan...',
                       disableOutlineBorder: false,
                       radius: 15.0,
-                      suffixIconConfiguration: const SuffixIconConfiguration(
-                        spacing: 15.0,
-                        bottomPosition: 15.0,
-                      ),
                       keyboardType: TextInputType.multiline,
                       textInputAction: TextInputAction.newline,
                       maxLines: 5,
                       minLines: 1,
+                      suffixIconConfiguration: const SuffixIconConfiguration(
+                        spacing: 15.0,
+                        bottomPosition: 15.0,
+                      ),
                       suffixIcon: [
                         Visibility(
                           visible: false,
@@ -168,13 +170,9 @@ class _MessageDetailScreenFooterState extends State<MessageDetailScreenFooter> {
                                               onTap: () async {
                                                 try {
                                                   ref.read(isLoading).state = true;
-                                                  final _pairingId = ref.read(pairingId).state;
 
                                                   final sender =
                                                       ref.read(UserProvider.provider)?.user;
-                                                  final pairing = await ref
-                                                      .read(ChatsMessageProvider.provider.notifier)
-                                                      .getUserByID(_pairingId);
 
                                                   final FilePickerResult? result =
                                                       await FilePicker.platform.pickFiles();
@@ -250,13 +248,12 @@ class _MessageDetailScreenFooterState extends State<MessageDetailScreenFooter> {
                         if (value.length == 1) {
                           try {
                             final userLogin = ref.read(UserProvider.provider)?.user;
-                            final _pairingId = ref.read(pairingId).state;
 
                             await ref
                                 .read(ChatsRecentProvider.provider.notifier)
                                 .updateTypingStatus(
                                   senderId: userLogin?.id ?? '',
-                                  pairingId: _pairingId,
+                                  pairingId: pairing.id,
                                   isTyping: true,
                                 );
                           } catch (e) {
@@ -266,13 +263,12 @@ class _MessageDetailScreenFooterState extends State<MessageDetailScreenFooter> {
                           debouncer.run(() async {
                             try {
                               final userLogin = ref.read(UserProvider.provider)?.user;
-                              final _pairingId = ref.read(pairingId).state;
 
                               await ref
                                   .read(ChatsRecentProvider.provider.notifier)
                                   .updateTypingStatus(
                                     senderId: userLogin?.id ?? '',
-                                    pairingId: _pairingId,
+                                    pairingId: pairing.id,
                                     isTyping: true,
                                   );
                             } catch (e) {
@@ -291,27 +287,29 @@ class _MessageDetailScreenFooterState extends State<MessageDetailScreenFooter> {
                   borderRadius: BorderRadius.circular(60.0),
                   onTap: () async {
                     try {
+                      ///* Start Loading
+                      ref.read(isLoading).state = true;
+
                       if (_messageController.text.trim().isEmpty) {
                         throw Exception('Pesan tidak boleh kosong');
                       }
-                      ref.read(isLoading).state = true;
-                      final sender = ref.read(UserProvider.provider)?.user;
-                      final _pairingId = ref.read(pairingId).state;
-                      final pairing = await ref
-                          .read(ChatsMessageProvider.provider.notifier)
-                          .getUserByID(_pairingId);
-                      final messageContent = _messageController.text;
 
-                      /// Save to temp Message for show in notification
-                      _listMessages.add(messageContent);
-                      log('List Message $_listMessages');
+                      final messageContent = _messageController.text;
+                      final sender = ref.read(UserProvider.provider)?.user;
+
+                      ///* Save message to temporary messages provider
+                      ref.read(tempListMessages.notifier).add(messageContent);
 
                       _messageController.clear();
+
+                      final tempMessages = ref.read(tempListMessages);
+
                       await ref.read(ChatsMessageProvider.provider.notifier).sendMessage(
-                          sender: sender,
-                          pairing: pairing,
-                          messageContent: messageContent,
-                          listMessage: _listMessages);
+                            sender: sender,
+                            pairing: pairing,
+                            messageContent: messageContent,
+                            listMessage: tempMessages,
+                          );
                       setState(() => _textFieldIsEmpty = true);
                     } catch (e) {
                       GlobalFunction.showSnackBar(
