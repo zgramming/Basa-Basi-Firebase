@@ -16,6 +16,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../../../main.dart';
 import '../../network/network.dart';
 import '../../screen/login/login_screen.dart';
+import '../utils.dart';
 
 /// Step send notification with API Firebase
 /// 1. Use this url API :  [https://fcm.googleapis.com/fcm/send]
@@ -64,8 +65,7 @@ class NotificationHelperRevision {
   static const _channelDesc = "Basa Basi Channel";
   static const _firebaseMessagingUrl = 'https://fcm.googleapis.com/fcm/send';
   //TODO: Hidden when push to github
-  static const _serverKey =
-      'AAAA1fmJsQ4:APA91bGi4km2b-m-xyzc3ydN9Lcdkv9LhXw0u10fvUQ7TNgo8B1qQ_H7q-TVJyCQZ7CmeOZN9-F9TALjAmfONaPNva2yKHFkTJHVucGHP0_CY8tB61fnUvQ5QRBX5kcDkekGSd-0CkxJ';
+  static const _serverKey = firebaseServerKey;
 
   static final _dio = Dio();
 

@@ -6,7 +6,7 @@
 </p>
 
 # Get it on : 
-<a href="https://play.google.com/store/apps/details?id=reynando.zeffry.kalmics" target="_blank"><img src="screenshot/playstore.png" width=48 height=48></a>
+<a href="https://play.google.com/store/apps/details?id=zeffry.reynando.basa_basi" target="_blank"><img src="screenshot/playstore.png" width=48 height=48></a>
 
 
 # Basa Basi
@@ -121,6 +121,7 @@ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __
 
 - [ ] Support Local Database (Hive/SQFlite) untuk offline mode.
 - [ ] Support kirim file (docx, pdf, ppt, xlsx, csv, dll) beserta previewnya saat di halaman chatting
+- [ ] Indikator per pesan sudah dibaca/belum saat di halaman detail pesan 
 - [ ] Support voice chat
 - [ ] Hapus spesifik pesan
 - [ ] Hapus seluruh pesan
