@@ -14,6 +14,15 @@
 Mau Ngelindur, Ngelantur, Curhat, PDKT, Pinjam Uang ?
 Diawali dengan Basa-Basi
 
+# Warning !!??!!??
+
+Karena project ini adalah open source dan dari awal diperuntukan sebagai referensi, terdapat beberapa limitasi dikarenakan menggunakan **_Free Tier_** dari Firebase, berikut limitasinya : 
+
+1. Storage **Realtime Database** hanya 1 GB. *_Warning Note_
+2. Cloud Storage kapasitas hanya 5 GB. *_Warning Note_
+
+**_Warning Note_** = Jika dalam jangka 1 bulan project ini sudah melebihi batas maksimal, kemungkinan terdapat beberapa bug yang akan muncul.
+
 # Preview Sekejap 
 
 
