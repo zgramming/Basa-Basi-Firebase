@@ -8,7 +8,6 @@
 # Get it on : 
 <a href="https://play.google.com/store/apps/details?id=zeffry.reynando.basa_basi" target="_blank"><img src="screenshot/playstore.png" width=48 height=48></a>
 
-
 # Basa Basi
 
 Mau Ngelindur, Ngelantur, Curhat, PDKT, Pinjam Uang ?
@@ -24,7 +23,6 @@ Karena project ini adalah open source dan dari awal diperuntukan sebagai referen
 **_Warning Note_** = Jika dalam jangka 1 bulan project ini sudah melebihi batas maksimal, kemungkinan terdapat beberapa bug yang akan muncul.
 
 # Preview Sekejap 
-
 
 <table>
   <tr align="center">
@@ -140,7 +138,6 @@ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __
 - [ ] Support tema pada halaman chatting
 - [ ] Ide ide si developer lainnya belum kesampaian
 
-
 # Konfigurasi
 
 ## 1. Generate google-service.json
@@ -158,6 +155,12 @@ Untuk saat ini, Project ini menggunakan 3 service pada firebase yaitu :
 - Storage
 
 Diharapkan pada firebase console kamu, sudah mengaktifkan ketiga service ini terlebih dahulu.
+
+# Bug yang diketahui
+
+- [ ] Notifikasi yang diterima duplikat saat aplikasi dalam mode background (Investigasi)
+- [ ] Jumlah pesan yang belum terbaca tidak ter-reset saat user masih/sedang di halaman pesan. Ekspetasi saat user masih/sedang dihalaman pesan, jumlah pesan yang terbaca otomatis menjadi 0 ketika pesan baru masuk.
+- [ ] Saat koneksi tidak stabil, menekan daftar pesan pada halaman depan akan menimbulkan penumpukan halaman setelah koneksi sudah stabil.
 
 # Issues
 
