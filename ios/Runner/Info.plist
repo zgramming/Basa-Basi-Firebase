@@ -47,23 +47,18 @@
 		</array>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
-		
 		<!-- Permission options for the `camera` group -->
 		<key>NSCameraUsageDescription</key>
 		<string>camera</string>
-
 		<!-- Permission options for the `microphone` group -->
 		<key>NSMicrophoneUsageDescription</key>
 		<string>microphone</string>
-
 		<!-- Permission options for the `speech` group -->
 		<key>NSSpeechRecognitionUsageDescription</key>
 		<string>speech</string>
-
 		<!-- Permission options for the `photos` group -->
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>photos</string>
-		
 		<key>UIStatusBarHidden</key>
 		<false/>
 	</dict>
